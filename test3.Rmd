@@ -1,0 +1,12 @@
+---
+title: "Untitled"
+author: "Ly Nguyen"
+date: "2023-10-16"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Bonus Question (optional): The CLT (for means) states that if we have a random sample $X_1, X_2, \cdots, X_n \overset{iid}{\sim} N(\mu, \sigma)$, then $\bar{X} = \frac{1}{n}\sum_{i=1}^n X_i \dot{\sim} N(\mu_{\bar{x}} = \mu, \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}})$. Prove $E[\bar{X}] = \mu$ and $SD[\bar{X}] = \frac{\sigma}{\sqrt{n}}$. If you would like to do this by hand, you can upload a picture in addition to the .Rmd and .pdf/.doc.

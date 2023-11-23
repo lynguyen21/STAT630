@@ -1,0 +1,6 @@
+"0","chsData <- chsData %>% "
+"0","  mutate(weight_grp = case_when(weight < 135 ~ ""< 135 lbs"","
+"0","                                weight >= 135 & weight <= 160 ~ ""135-160 lbs"","
+"0","                                TRUE ~ ""> 160 lbs"")) %>%"
+"0","    mutate(weight_grp = factor(weight_grp))"
+"0",""

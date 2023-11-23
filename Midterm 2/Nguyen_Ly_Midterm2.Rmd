@@ -1,0 +1,221 @@
+---
+title: "Midterm 2"
+author: "Ly Nguyen"
+date: "2023-11-07"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+#install.packages("gtsummary")
+library(dplyr)
+library(ggplot2)
+library(openintro)
+library(knitr)
+library(gtsummary)
+library(tidyr)
+```
+
+
+```{r}
+bcar <- read.csv("~/Documents/Personal Docs_East Bay/STAT 630/bcar.csv")
+View(bcar)
+```
+
+Part 1: Data Cleaning
+
+```{r}
+bcar <- bcar %>%
+  mutate(month = factor(month),
+         dose = factor(dose),
+         sex_f = factor(sex,
+                         labels = c("Female", "Male"))
+)
+summary(bcar)
+
+```
+
+Part 2: Exploratory Data Analysis
+
+2. 
+
+```{r}
+
+#Calculate n(%) of sex
+
+table(bcar$sex_f)
+
+props <- prop.table(table(bcar$sex_f))
+props
+
+#Calculate mean (sd) of bmi
+
+mean_bmi <- round(mean(bcar$bmi),2)
+mean_bmi
+
+sd_bmi <- round(sd(bcar$bmi),2)
+sd_bmi
+
+#Calculate mean (sd) of chol
+
+mean_chol <- round(mean(bcar$chol),2)
+mean_chol
+
+sd_chol <- round(sd(bcar$chol),2)
+sd_chol
+
+#Calculate n(%) of dose
+
+table(bcar$dose)
+
+props_1 <- round((prop.table(table(bcar$dose))),2)
+props_1
+
+
+#Calculate mean (sd) of age
+
+mean_age <- round(mean(bcar$age),2)
+mean_age
+
+sd_age <- round(sd(bcar$age),2)
+sd_age
+
+```
+
+| Variable     | mean(sd) or n (%)                              |
+|--------------|------------------------------------------------|
+|sex           |Female:     36 (`r round((props[1]*100),2)`%)  |
+|              |Male:     40 (`r round((props[2]*100),2)`%)    |
+|bmi           |mean: `r mean_bmi` (sd: `r sd_bmi`)     |
+|chol           |mean: `r mean_chol` (sd: `r sd_chol`)     |
+|dose          |0 mg/day:     16 (`r props_1[1]*100`%)  |
+|              |15 mg/day:     14 (`r props_1[2]*100`%)  |
+|              |30 mg/day:     16 (`r props_1[3]*100`%)  |
+|              |45 mg/day:     12 (`r props_1[4]*100`%)  |
+|              |60 mg/day:     18 (`r props_1[5]*100`%)  |
+|age           |mean: `r mean_age` (sd: `r sd_age`)     |
+
+
+3. 
+
+```{r}
+# calculate the mean and standard deviation of vitamin E (vite) stratified by month
+vite_month0 <- bcar %>%
+  filter(month == 0) %>%
+  select(vite) %>%
+  pull()
+
+
+mean_vite_month0 <- mean(vite_month0)
+mean_vite_month0
+
+sd_vite_month0 <- sd(vite_month0)
+sd_vite_month0
+
+vite_month11 <- bcar %>%
+  filter(month == 11) %>%
+  select(vite) %>%
+  pull()
+
+mean_vite_month11 <- mean(vite_month11)
+mean_vite_month11
+
+sd_vite_month11 <- sd(vite_month11)
+sd_vite_month11
+
+# calculate the mean and standard deviation of beta-carotene (bcarot) stratified by month
+bcarot_month0 <- bcar %>%
+  filter(month == 0) %>%
+  select(bcarot) %>%
+  pull()
+
+
+mean_bcarot_month0 <- mean(bcarot_month0)
+mean_bcarot_month0
+
+sd_bcarot_month0 <- sd(bcarot_month0)
+sd_bcarot_month0
+
+bcarot_month11 <- bcar %>%
+  filter(month == 11) %>%
+  select(bcarot) %>%
+  pull()
+
+mean_bcarot_month11 <- mean(bcarot_month11)
+mean_bcarot_month11
+
+sd_bcarot_month11 <- sd(bcarot_month11)
+sd_bcarot_month11
+```
+| Variable     | Beginning of the study                                 | end of the study         |
+|--------------|------------------------------------------------|-------------------------|
+|              | mean(sd)                              |  mean(sd)      |
+|Vite        |mean: `r mean_vite_month0` (sd: `r sd_vite_month0`)     |mean: `r mean_vite_month11` (sd: `r sd_vite_month11`)  |
+|bcarot        |mean: `r mean_bcarot_month0` (sd: `r sd_bcarot_month0`)     |mean: `r mean_bcarot_month11` (sd: `r sd_bcarot_month11`)  |
+
+4. 
+ 
+The mean of vitamin E at the beginning of the study was more than that one at the ending. The sd of the vitamin E was quite the same in both of two period, so the variability stays unchanged. The average bcarot at the beginning was just 240, but at the ending it significantly came up to 1416. The sd of bcarot also went higher, so it shows that the variability of bcarot expanded more. 
+
+6. Compare the shape, center, and spread of both histograms in 2-3 complete sentences. Use the statistics
+you calculated in Question 3 to add to your comparison.
+
+7. Using a plot of your choice, visualize the relationship between vitamin E (vite) and dose (dose).
+
+```{r}
+ggplot(bcar, aes(x = dose, y = vite)) +
+  geom_point() +
+  labs(title = "Relationship between  vitamin E (vite) and dose (dose)",
+       y = "Beta-carotene dose", x = "Vitamine E level")
+```
+Part 2: Data Analysis
+
+```{r}
+bcar_wide <- bcar %>%
+tidyr::pivot_wider(names_from = month,
+values_from = c(bcarot, vite))
+```
+
+
+8. Create a 95% confidence interval for the true average difference in vitamin E level in month 11 (vite_11) minus month 0 (vite_0). Check that the necessary conditions are satisfied, compute the interval in R, and then interpret the interval in the context of the problem.
+Next, we are going to categorize vitamin E into low or high.
+```{r}
+bcar_wide$vite_low_0 <- ifelse(bcar_wide$vite_0 < 6, "low vit E", "high Vit E")
+
+bcar_wide$vite_low_11 <- ifelse(bcar_wide$vite_11 < 6, "low vit E", "high Vit E")
+
+bcar_wide <- bcar_wide %>%
+mutate_if(is.character, as.factor)
+
+bcar_wide <- bcar_wide %>%
+  mutate(vite_diff = vite_11 - vite_0)
+ 
+mean_vite_diff <- mean(bcar_wide$vite_diff)
+sd_vite_diff <- sd(bcar_wide$vite_diff)
+
+# Calculate standard error
+n <- length(bcar_wide$vite_diff)
+se_vite_diff <- bcar_wide$sd_vite_diff / sqrt(n)
+
+# Set the confidence level
+conf_level <- 0.95
+
+# Calculate the critical t-value
+t_stat <- qt((1 + 0.95) / 2, df = n - 1)
+
+p_val <- pt(t_stat, df = n - 1, lower.tail = FALSE)
+p_val
+
+t_stat + c(-1, 1) * qt(0.975, df = n - 1) * se_vite_diff 
+
+stat <- mean(mem$Diff)
+se <- sd(mem$Diff) / sqrt(nd)
+
+t_stat <- stat / se
+t_stat
+
+```
+
+A confidence interval (CI) of 2.026 means that we are 95% confident that the true the true average difference in vitamin E level in month 11 (vite_11) minus month 0 (vite_0) falls within the range of -2.026 and 2.026 .
+
+Self - assessment: M (I try my best in the rush period of time, I am 90% confident that my result makes sense)

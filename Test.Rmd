@@ -1,0 +1,120 @@
+---
+title: "test"
+author: "Ly Nguyen"
+date: "2023-10-12"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r}
+p <- 0.19
+n <-c(25,50,100)
+n_samp <- 1000
+samples_sz_25 <-rbinom(n_samp, 25, p) 
+samples_sz_50 <-rbinom(n_samp, 50, p) 
+samples_sz_100 <-rbinom(n_samp, 100, p) 
+
+xbar_sz_25 <- mean(samples_sz_25)
+s_sz_25 <- sd(samples_sz_25)
+
+xbar_sz_50 <- mean(samples_sz_50)
+s_sz_50 <- sd(samples_sz_50)
+
+xbar_sz_100 <- mean(samples_sz_100)
+s_sz_100 <- sd(samples_sz_100)
+```
+
+```{r}
+p <- 0.19
+
+# Define sample sizes
+sample_sizes <- c(25, 50, 100)
+
+# Define the number of samples
+num_samples <- 1000
+
+# Initialize empty vectors to store results
+xbar <- s <- numeric(length(sample_sizes))
+
+# Loop through different sample sizes
+for (i in seq_along(sample_sizes)) {
+  # Generate random samples
+  samples <- rbinom(num_samples, sample_sizes[i], p)
+  
+  # Calculate sample mean and standard deviation
+  xbar[i] <- mean(samples)
+  s[i] <- sd(samples)
+}
+
+results_df <- data.frame(Sample_Size = sample_sizes, Xbar = xbar, S = s)
+
+# Print the data frame
+print(results_df)
+```
+```{r}
+p <- 0.19  # Population proportion
+sample_sizes <- c(25, 50, 100)  # Sample sizes
+
+# Function to calculate standard deviation of sample proportions
+calc_sample_proportion_sd <- function(p, n) {
+  sqrt(p * (1 - p) / n)
+}
+
+# Calculate standard deviations
+standard_deviations <- sapply(sample_sizes, function(n) calc_sample_proportion_sd(p, n))
+
+# Print results
+for (i in 1:length(sample_sizes)) {
+  cat("Sample Size:", sample_sizes[i], "\n")
+  cat("Standard Deviation:", standard_deviations[i], "\n\n")
+}
+```
+
+```{r}
+p <- 0.19
+n <-c(25,50,100)
+n_samp <- 1000
+
+sd_theo <- numeric(length(n))
+sd_theo
+for (i in seq_along(n)) {
+  sd_theo[i] <- sqrt((p * (1 - p)) / n)
+}
+
+results_df_sd <- data.frame(Sample_Size = i, mu = p, Sd = sd_theo)
+results_df_sd
+
+```
+
+```{r}
+
+choose(12,0)
+(0.9^12)*0.1
+0.9^12
+choose(29,2)*(0.1^3)*(0.9^27)
+```
+
+```{r}
+pnorm(2.13)-pnorm(0.47) 
+pnorm(1.27) - pnorm(-0.97)
+1-pnorm(-1.56)
+1-pnorm(2.78)
+pnorm(1.96)-pnorm(-1.96)
+pnorm(1)-pnorm(-1)
+pnorm(2)-pnorm(-2)
+pnorm(3)-pnorm(-3)
+
+```
+```{r}
+choose(12,0)*0.1*(0.9)^12
+```
+```{r}
+a <- 1:12
+a
+1-sum(0.1*0.9^(a-1)*choose(a-1,0))
+```
+

@@ -1,0 +1,118 @@
+---
+title: "Let's Learn R Markdown"
+date: "2023-08-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("openintro") ## AHH NEVER DO THIS
+library(openintro)
+```
+
+# Hello world.
+## Hello world.
+### Hello world.
+#### Hello world.
+##### Hello world.
+
+****  
+
+*Hello* **world**.
+~~Hello world~~.
+
+> Add two spaces at the end of a line.
+
+Hello world.  
+Hello world.
+
+### Creating R chunks
+
+: Keyboard shortcut: command (ctrl) + option + i.
+
+```{r loading_data}
+# Hello world.
+data("mtcars")
+```
+
+: R chunk options
+
+Where is it??
+```{r chunk_options, eval=FALSE, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+# Hello world.
+summary(mtcars)
+```
+
+Here it is!
+```{r}
+summary(mtcars)
+```
+
+## PLEASE DO NOT DO THIS....EVER
+```{r}
+mtcars
+```
+
+```{r}
+mean(mtcars$mpg)
+```
+
+Or you can write inline code.. The mean mpg for cars in 1974 is `r round( mean(mtcars$mpg), 2)`.
+
+```{r}
+mean_mpg <- mean(mtcars$mpg)
+sd_mpg <- sd(mtcars$mpg)
+
+mean_wt <- round( mean(mtcars$wt), 2)
+sd_wt <- round( sd(mtcars$wt), 2)
+
+table(mtcars$am_f) # WAIT! BE CAREFUL HERE
+mtcars$am_f <- factor(mtcars$am, 
+                      labels = "Automatic", "Manual")
+addmargins(table(mtcars$am_f))
+
+
+table(mtcars$am_f) / nrow(mtcars)
+## OR
+props <- prop.table(table(mtcars$am_f))
+props
+```
+
+### Making tables by hand
+
+| Right | Left | Default | Center |
+|------:|:-----|---------|:------:|
+| 12 | 12 | 12 | 12 |
+| 123 | 123 | 123 | 123 |
+| 1 | 1 | 1 | 1 |
+
+| Variable | mean (sd) or n (%) |
+|--------|--------------|
+| mpg | `r mean_mpg` (`r sd_mpg`) |
+| weight | `r mean_wt` (`r sd_wt`) |
+| Transmission | |
+| - Automatic | 19 (`r props[1]*100`%) |
+| - Manual | 13 (`r props[2]*100`%) |
+
+
+An insurance company sells both homeowners insurance and automobile deductible insurance Let X be the deductible on the homeowners insurance and Y the deductible on automobile insurance. Among those who take both types of insurance with this company, we find the following probabilities.  Compute mean (x), mean (y), var(x),var(y)
+
+| x | 100 | 500 | 1000 |
+|------:|:-----|---------|:------:|
+| y=1000 | 0.05 | 0.1 | 0.15 |
+| y=500 | 0.1 | 0.2 | 0.05 |
+| y=100 | 0.2 | 0.1 | 0.05 |
+
+
+```{r}
+m <- pnorm(5, -3, 5) - pnorm(-5, -3, 5)
+m
+
+i <- pnorm(16, 10, 3) - pnorm(7, 10, 3)
+i
+
+p <- pnorm(5, 0, 4) - pnorm(-5, 0, 4)
+p
+```
+
+

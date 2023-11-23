@@ -1,0 +1,91 @@
+---
+title: 'STAT 630: Homework 4'
+author: ' '
+date: 'Due: October 12th, 2023'
+output: html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+1. Simulate the M\&M activity in R. Let the true proportion of blue M\&M's be p = 0.19. Suppose there are three different sized bags of M&M's: n = 25, 50, and 100. Use the `rbinom()` function to create 1,000 different samples for each of the three different sample sizes (n). Show your code below. You do not need to print any output.
+
+
+```{r}
+p <- 0.19
+n <-c(25,50,100)
+n_samp <- 1000
+samples_sz_25 <-rbinom(n_samp, 25, p) 
+samples_sz_50 <-rbinom(n_samp, 50, p) 
+samples_sz_100 <-rbinom(n_samp, 100, p) 
+
+```
+
+2. Compute the mean and standard deviation of the sampling distribution for each sample size based on your 1000 simulations. Additionally, calculate the theoretical mean and standard deviation for each size based on the CLT for proportions. Put the information in the table below. You can use this table or create your own. If you choose to use this table, note that the vertical bars \| must be lined up.
+
+
++---------+-------------------------------+-------------------------------+
+|         | Simulation                    | Theoretical                   |
++=========+===============================+===============================+
+| n = 10  | $\bar{x}_{\hat{p}_{25}} =$    | $\mu_{\hat{p}_{25}} =$        |
+|         |                               |                               |
+|         | $s_{\hat{p}_{25}} =$          | $\sigma_{\hat{p}_{25}} =$     |
++---------+-------------------------------+-------------------------------+
+| n = 20  | $\bar{x}_{\hat{p}_{50}} =$    | $\mu_{\hat{p}_{50}} =$        |
+|         |                               |                               |
+|         | $s_{\hat{p}_{50}} =$          | $\sigma_{\hat{p}_{50}} =$     |
++---------+-------------------------------+-------------------------------+
+| n = 100 | $\bar{x}_{\hat{p}_{100}} =$   | $\mu_{\hat{p}_{100}} =$       |
+|         |                               |                               |
+|         | $s_{\hat{p}_{100}} =$         | $\sigma_{\hat{p}_{100}} =$    |
++---------+-------------------------------+-------------------------------+
+
+```{r}
+
+```
+
+
+3. Compare $\sigma_{\hat{p}_{10}}$ with $\sigma_{\hat{p}_{20}}$. Compare $\sigma_{\hat{p}_{10}}$ with $\sigma_{\hat{p}_{100}}$. How much do they differ by?
+
+
+4. Suppose that out of all Olympic athletes, 70% of them train for more than 40 hours per week. Suppose a researcher took a sample of 250 athletes.
+
+    a. What proportion of the sample would be expected to train for more than 40 hours per week?
+
+    b. What is the sampling distribution of the sample proportion?
+
+
+    c. What is the probability that more than 35% of our sampled athletes train for more than 40 hours per week? Write the probability statement, then compute using R.
+
+
+    d. Calculate a 90% confidence interval for the true proportion of Olympic athletes who train more than 40 hours per week in R. Interpret *in the context of the problem*.
+
+
+5. Simulating confidence intervals
+
+    a. Compute 1000 confidence intervals for each of the three simulation settings from Question 1.
+
+    b. Plot the confidence intervals for each simulation setting. Include a line to mark true proportion. Color the confidence interval one color if it includes the true proportion and another color if it does not include the true proportion.
+
+    c. For each simulation setting, calculate how many confidence intervals contained the true proportion. Is this what we expect?
+
+---
+
+6. As kitten season is coming up (yes that is a real thing), the number of newborn kittens found outside without their mom increases during this part of the year. Suppose the Hayward Humane Society has taken in 70 kittens. They gave 10 fosters each 7 kittens. The fosters collect the weight of each of their 7 newborn kittens and calculate the mean weight for their litter.
+
+    Let the random variable $X$ = the weight of a newborn kitten. Label each description as either a population, sample, or sampling distribution.
+
+    a. The distribution of all newborn kitten weights.
+
+    b. The distribution of 10 mean weights of newborn kittens from each foster's litter.
+
+    c. The distribution of 7 newborn kitten weights cared for by a single foster.
+
+--- 
+Recall the Bechdel dataset from class. ([Link](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-03-09)).
+
+7. Using the data, perform a 5-step hypothesis test using a confidence interval to determine if the percentage of movies that pass the Bechdel test in 2013 is greater than 50\%.
+
+Bonus Question (optional): The CLT (for means) states that if we have a random sample $X_1, X_2, \cdots, X_n \overset{iid}{\sim} N(\mu, \sigma)$, then $\bar{X} = \frac{1}{n}\sum_{i=1}^n X_i \dot{\sim} N(\mu_{\bar{x}} = \mu, \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}})$. Prove $E[\bar{X}] = \mu$ and $SD[\bar{X}] = \frac{\sigma}{\sqrt{n}}$. If you would like to do this by hand, you can upload a picture in addition to the .Rmd and .pdf/.doc.
+

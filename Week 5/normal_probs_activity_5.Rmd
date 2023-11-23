@@ -1,0 +1,217 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+---
+title: "Normal Probabilities"
+output:
+  pdf_document: default
+  ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+-   `dnorm()`: P(X = x) = height of normal distribution
+
+-   `pnorm()`: pnorm(x, mean, sd)
+
+    -   lower.tail = TRUE (default) $\Rightarrow \ \ P(X \leq x) = F(x)$
+    -   lower.tail = FALSE $\rightarrow \ \ P(X \geq x)$
+
+-   `qnorm()`: Inverse normal - Find c, such that $P(X \leq c) = p$
+
+-   `rnorm()`: Random samples of size n
+
+1.  Let $Z \sim N(0,1)$. Compute the following probabilities.
+
+    a.  $P(Z < 1.35)$ = `r pnorm(1.35)`  
+
+    $f(x) = (2\pi\sigma^2)^{-1/2}...$
+
+```{r}
+pnorm(1.35)
+```  
+  
+  mean = 36, sd = 0.11, Find P(X<35.8)
+  
+  1st way:
+  
+  P(X<35.8) = P(Z< (35.8-36)/0.11) = P(Z<-1.82) = pnorm(-1.82) = 0.0344
+  
+  2nd way:
+  
+  P(X<35.8) = pnorm(35.8, 36, 0.11) = 0.0344
+  
+b.    $P(Z > -0.27)$
+
+```{r}
+pnorm(-0.27, lower.tail = FALSE)
+```  
+  
+c.    $P(-0.1 < Z < 1.4)$
+
+```{r}
+pnorm(1.4) - pnorm(-0.1)
+```  
+
+2.  Next, find the value $c$ such that:  
+
+    a.  $P(Z < c) = 0.025$
+
+```{r}
+qnorm(0.025)
+```
+  
+b.  $P(X > c) = 0.05$ where $X \sim N(10, 5)$  
+
+```{r}
+qnorm(0.05, 10, 5, lower.tail = FALSE)
+```
+
+c.  $P(-c < Z < c) = 0.99$.
+
+        $c$ = `r qnorm(0.995)`
+
+```{r}
+qnorm(0.995) #P(Z < c) = 0.995 => Find c? 
+qnorm(0.005, lower.tail = FALSE) #P(Z > c) find c?
+qnorm(0.005) #P(Z < c) = 0.005 
+
+#qnorm(0.995) : P(Z < c) => find or qnorm(1-0.995, lower.tail = FALSE)
+#qnorm(1-0.995) : P(-c < Z)
+
+```
+
+3.  Generate a random sample of size $n = 1000$ from a standard normal distribution. Use the `graphics` package to plot the histogram. Make sure your plot is well-labeled!
+
+```{r}
+x <- rnorm(1000)
+x
+hist(x, 
+     main = "Distribution of 1000 samples \nfrom N(0,1)",
+     xlab = "x",
+     ylab = "Frequency")
+```
+
+4.  Compare your histogram to at least one other person's in the class. Are they the same or different? Why is this the case?
+
+5.  Use the `graphics` package to plot the pdf of a standard normal distribution.
+
+```{r}
+x <- seq(-3.5, 3.5, 0.1)
+x
+y <- dnorm(x)
+y
+plot(x, y, type = "l")
+
+```
+
+6.  Plot the following 3 distributions in a single figure. $X \sim N(10, 3)$, $X\sim N(10,5)$, and $X \sim N(10, 7)$.
+
+```{r}
+x1 <- seq(-11.5, 31.5, 0.1) # N(10, 3)
+y1 <- dnorm(x1, mean = 10, sd = 3)
+
+x2 <- seq(-11.5, 31.5, 0.1) #N(10, 5)
+y2 <- dnorm(x2, mean = 10, sd = 5)
+
+x3 <- seq(-11.5, 31.5, 0.1) #N(10, 7)
+y3 <- dnorm(x3, mean = 10, sd = 7)
+
+plot(x1, y1, type = "l", xlim = c(-12, 32))
+lines(x2, y2, lty = 2, col = "cornflowerblue") #The line type is set to dashed (lty = 2)
+lines(x3, y3, lty = 3, col = "red") #The line type is set to a different dash pattern (lty = 3)
+```
+
+7.  The following questions refer to the `email` dataset from the `openintro` package.
+
+    a.  Plot the distribution of the variable `num_char` using `ggplot2`.
+
+```{r}
+library(openintro)
+library(ggplot2)
+library(dplyr)
+
+data("email")
+View(email)
+```
+
+```{r}
+email %>% 
+  mutate(spam = factor(spam, labels = c("No", "Yes")))  %>% 
+  ggplot(aes(x = num_char,
+             y = line_breaks,
+             col = spam, shape = spam)) +
+  geom_point(alpha = 0.3) +
+  labs(title = "Relationship between Num. of Characters\n & Line Breaks, by Spam Status",
+       x = "Num. Characters (in thousands)",
+       y = "Line Breaks",
+       col = "Spam",
+       shape = "Spam")
+
+# email %>% 
+#   mutate(spam = factor(spam, labels = c("No", "Yes")))  %>% 
+#   ggplot(aes(x = ....,
+#              y =  ....,
+#              col = ..., shape = ...)) +
+#   geom_point(alpha = 0.3, binwidth = ..., col = ...., fill = ....) +
+#   labs(title = "Relationship between Num. of Characters\n & Line Breaks, by Spam Status",
+#        x = "Num. Characters (in thousands)",
+#        y = "Line Breaks",
+#        col = "Spam",
+#        shape = "Spam")
+
+
+```
+
+b.  Create a qq-plot to assess the normality of this variable.
+
+```{r}
+# hist(email$num_char, breaks = 15)
+
+mn <- mean(email$num_char)
+std_dev <- sd(email$num_char)
+
+x <- seq(mn-3*std_dev, mn+3*std_dev, 0.1)
+y <- dnorm(x, mean = mn, sd = std_dev)
+
+hist(email$num_char, breaks = 15)
+lines(x, y, col = "red")
+
+qqnorm(log(email$num_char))
+qqline(log(email$num_char), col = "red")
+```
+
+8.  Simulations. Simulate three random samples from a standard normal random variables: one with a sample size n = 10, n = 30, and n = 100. Assess the normality of each of the samples. What do you notice? Why do you think that is happening?
+
+```{r}
+x_1 <- rnorm(10)
+x_1
+hist(x_1, 
+     main = "Distribution of 10 samples \nfrom N(0,1)",
+     xlab = "x",
+     ylab = "Frequency")
+
+x_2 <- rnorm(30)
+x_2
+hist(x_2, 
+     main = "Distribution of 10 samples \nfrom N(0,1)",
+     xlab = "x",
+     ylab = "Frequency")
+
+x_3 <- rnorm(100)
+x_3
+hist(x_3, 
+     main = "Distribution of 10 samples \nfrom N(0,1)",
+     xlab = "x",
+     ylab = "Frequency")
+
+x_4 <- rnorm(40)
+
+hist(x_4,
+     main = "Distribution of 40 samples \nfrom N(0,1)",
+     xlab = "x",
+     ylab = "Frequency")
+```

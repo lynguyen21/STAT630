@@ -1,0 +1,7 @@
+"0","chsData <- read.table(""~/Documents/Personal Docs_East Bay/STAT 630/HW6/chsData.txt"", quote=""\"""", comment.char="""")"
+"0","View(chsData)"
+"0","library(dplyr)"
+"0","library(ggplot2)"
+"0","library(openintro)"
+"0","library(knitr)"
+"0",""

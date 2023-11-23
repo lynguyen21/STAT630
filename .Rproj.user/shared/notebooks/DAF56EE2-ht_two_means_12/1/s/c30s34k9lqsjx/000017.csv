@@ -1,0 +1,7 @@
+"0","memory <- readr::read_csv(here::here(""islander_data.csv""))"
+"0",""
+"0","mem <- memory %>% "
+"0","  filter(Happy_Sad_group == ""S"","
+"0","         Drug == ""A"")"
+"0",""
+"0","nd <- nrow(mem)"

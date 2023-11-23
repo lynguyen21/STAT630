@@ -1,0 +1,74 @@
+---
+title: "Summarizing & Visualizing Data"
+subtitle: "The Tidyverse Way"
+date: "September 7th, 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("tidyverse",dependencies = TRUE)
+#library(tidyverse)
+library(openintro)
+library(dplyr)
+library(ggplot2)
+data("email")
+```
+
+Instructions:  
+-   Get into groups of 2-3  
+-   You will be randomly assigned a number between 2-21 (that number represents the column of your variable of interest)
+
+### Summarizing
+
+Create summary statistics for your column using `summarise()`. 
+
+```{r}
+email %>% 
+  summarise(mean = mean(password),
+            sd = sd(password),
+            count = n())
+```
+
+Create summary statistics for your column + spam using `group_by()` 
+
+```{r}
+email %>% 
+  group_by(spam) %>% 
+  summarise(count = n(),
+            mean_password = mean(password),
+            sd_password = sd(password)
+            
+                  )
+  
+```
+
+***
+
+### Visualizing
+
+Create a plot for your column using `ggplot2`. 
+
+```{r}
+barplot(table(email$password))
+
+ggplot(data = email, aes(x = password)) +
+    geom_bar()
+
+```
+
+
+Create a plot for your column + spam using `ggplot2`.  
+
+```{r}
+
+email$spam_f <- factor(email$spam,
+                       labels = c("No Spam", "Spam"))
+
+email %>% 
+  select(spam, spam_f)
+
+ggplot(email, aes(x = spam_f, y = password)) +
+    geom_boxplot()
+```
+

@@ -1,0 +1,149 @@
+---
+title: 'STAT 630: Homework 1'
+author: ' Ly Que Nguyen '
+date: 'Due: September 7th, 2023 at 11:59pm'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+1. Listen to the following episode of [Stats + Stories](https://statsandstories.net/society1/getting-better-data-on-where-we-live).
+
+    a) What is the sampling unit in the American Housing Survey?
+    
+  **Housing unit**
+    
+    b) What does HUD stand for?
+    
+  **Housing and Urban Development**
+    
+    c) How does the Census Bureau try to reduce respondent burden?
+    
+  Through the use of administrative data, property data should be public information, the county collects information about all the residences and the property in their area. For taxation purposes, they want to know the value of the land and the building on that land, to tax its residents. But to do that, they need detailed information. They need a number of bedrooms, they need your belt of things that impact their valuation of the housing value. And this data exists throughout the country. And it's public. And there are now data products out there that go out, put all this data to gather throughout the country to gather and deck one data file and it can be used.
+    
+    d) Describe the sampling process in a few sentences _in your own words_.
+    
+  The American Housing Survey is a long-running, comprehensive study of housing units and their occupants since 1973. It covers various aspects, including unit features, resident demographics, and housing costs. Sampling starts with the Census Bureau's Master Address File, which compiles US addresses. About 100,000 units are selected, enabling national and regional estimates for large cities and other statistical areas. Conducted biennially, residents provide details on their unit, like bedrooms, improvements, and nearby amenities. Demographic data is also collected. One notable feature of the American Housing Survey is its longitudinal nature. Notably, the survey revisits the same units every two years, offering insights into changing trends. Trends include more adult children and unrelated families living together. This reflects shifts in household composition. Additionally, the survey assesses housing quality and costs, providing crucial data for policy making.
+    
+    e) What would you like to know about? Write a research question that could be answered with the American Housing Survey.
+    
+   How have trends in household composition, including an increase in adult children living at home and unrelated families sharing housing units, evolved over the past two decades?
+    
+2. Install the `openintro` package, by uncommenting the following code. 
+
+*Reminder: you only have to do this once- like installing an app on your phone. After you run this line of code, either **comment** it out using `#`, or just delete it.*
+
+```{r}
+#install.packages("openintro")
+```
+
+After installing the R package for our book, load it, i.e., open the app!
+
+```{r}
+library(openintro) # Load the package
+```
+
+Load in the `babies` dataset. Use the help file to learn more.
+
+```{r}
+data(babies) # Load the data
+?babies # View the help file
+```
+
+View a summary of the dataset.
+```{r}
+dplyr::glimpse(babies) # Glimpse the dataset
+summary(babies) # View a summary of each column (variable)
+```
+
+    a) What does each row in the table represent, i.e., what is the observational unit? 
+    
+   Each row provides data of 8 variables including the order of case, birth's weight, gestation, parity, age, height, weight and smoke status of each case/observation from 1 to 1238.
+    
+    what is the observational unit? 
+    
+    **Baby**
+    
+    b) How many participants were in the study? 
+    **1236 babies**
+    
+    c) All variables are coded as integers. Which variables should be recoded as *factors*? 
+    Recode these variables in the code chunk below. 
+    
+   Smoke status should be recoded as factors.
+    
+```{r}
+babies$smoke_f <- factor(babies$smoke,
+                        labels = c("no", "yes"))
+```
+
+    d) Create a plot to visualize one variable of your choice using `base R` functions. in the code chunk below. 
+    Make sure to add a title and relabel the x and y axes.
+    
+```{r}
+hist(babies$height,
+     main = "Distribution of height of 1236 babies",
+     breaks = 10, 
+     xlab = "height", 
+     ylab = "count", 
+     col = "red") 
+```
+
+    e) Create a plot to visualize the same variable from part (d) using `tidyverse` functions. in the code chunk below. 
+    Make sure to add a title and relabel the x and y axes.
+    
+```{r}
+
+```
+
+    f) What did you learn from the plots above that you did not learn from the `summary()`? Explain.
+    
+   The plot provides me with the information of central tendency of the distribution which I did not learn from the summary. While the summary does not let me know what the height of most of the babies is. In this bar chart, we can see that most of the babies's height is between 60 and 65.
+    
+    g) Fill in the table below. Show the code you used in the R chunk below as well.
+    
+| Variable | mean (sd) or n(/%) |
+|--------|-----------------------|
+| Mother's Age | mean 27.25527 sd(5.781405)|
+| Parity | mean 0.2548544 sd(0.4359557) |
+| Gestation | mean 279.3385 sd(16.02769)|
+| Birth weight (oz) | mean 119.5769 sd(18.23645) |
+| Mother's weight (lbs)| mean 128.6258 sd(20.97186) |
+| Smoke status |no_smoke 742 (60.03%) smoke 484 (39.15%)| 
+
+
+```{r}
+mean(babies$age, na.rm = TRUE)
+sd(babies$age, na.rm = TRUE)
+
+mean(babies$parity)
+sd(babies$parity)
+
+mean(babies$gestation, na.rm = TRUE)
+sd(babies$gestation, na.rm = TRUE)
+
+mean(babies$bwt)
+sd(babies$bwt)
+
+mean(babies$weight, na.rm = TRUE)
+sd(babies$weight, na.rm = TRUE)
+
+table(babies$smoke_f)/nrow(babies)
+props <- prop.table(table(babies$smoke_f))
+
+props[1]*100
+
+library(dplyr)
+babies %>%
+    group_by(smoke_f) %>%
+    summarise(percent = 100 * n() / nrow(babies))
+```
+
+    
+    
+    
+    

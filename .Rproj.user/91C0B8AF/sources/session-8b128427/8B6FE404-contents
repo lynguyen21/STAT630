@@ -1,0 +1,86 @@
+---
+title: "Hypothesis Testing for a Difference in Two Proportions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+options(scipen = 999) # to prevent scientific notation
+```
+
+## Does the temperature you drink your tea (or coffee) increase your risk of esophageal cancer?
+
+The "[Golestan Cohort Study](https://onlinelibrary.wiley.com/doi/epdf/10.1002/ijc.32220), a population-based propective study of 50,045 individuals aged 40-75 years", followed individuals for roughly 10 years to see if there was an association between the temperature at which a person drinks tea/coffee and their risk of esophogeal cancer.
+
+After some exclusion criteria were set in place, there were 49,996 total participants considered in the study. (Approximately, ) 19,448 participants drank their tea at temperatures of < 60°C (140°F) and the remaining 30,548 drank their tea at higher temperatures. Of those who prefer lower temperatures, 92 developed esophogeal cancer compared to the 222 who developed cancer in the higher temperature group. 
+
+Is there significant evidence that those who prefer their tea hotter are more likely to develop esophogeal cancer?
+
+
+
+### 1. Write the hypotheses.
+
+* 1 = higher    
+* 2 = lower
+
+$H_0: p_1 - p_2 = 0$  
+
+$H_A: p_1 - p_2 > 0$  
+
+
+### 2. Check conditions.
+
+1. Independence within and between:   
+* Within: both sample sizes < 10% of population of coffee/tea drinkers 
+* Between: coffee/tea heat preferences reasonably independent  
+
+2. Success/failure counts: 
+
+```{r, echo = FALSE}
+n1 <- 30548
+n2 <- 19448
+
+p1_hat <- 222/n1
+p2_hat <- 92/n2
+```
+
+All counts $\geq 5$
+```{r, echo = FALSE}
+success1 <- n1*p1_hat; failure1 <- n1*(1-p1_hat)
+
+success2 <- n2*p2_hat; failure2 <- n2*(1-p2_hat)
+```
+
+$n_1\hat{p}_1 =$ `r success1` $\geq 5$  
+$n_1(1-\hat{p}_1) =$ `r failure1` $\geq 5$
+
+$n_2\hat{p}_2 =$ `r success2` $\geq 5$  
+$n_2(1-\hat{p}_2) =$ `r failure2` $\geq 5$
+
+
+### 3. Calculate test statistic.
+
+```{r, echo = FALSE}
+stat <- p1_hat - p2_hat
+null_val <- 0
+se <- sqrt( p1_hat*(1-p1_hat)/n1 + p2_hat*(1-p2_hat)/n2)
+
+z_stat <- (stat - null_val) / se
+```
+
+$Z_{\text{stat}} =$ `r z_stat`
+
+### 4. Calculate p-value.
+
+```{r, echo = FALSE}
+p_val <- pnorm(z_stat, lower.tail = FALSE)
+```
+
+p-value = `r round(p_val, digits = 4)`  
+
+### 5. Make a decision and conclude in the context of the problem.
+
+Decision: Reject $H_0$  
+Conclusion: We have enough evidence that the difference in proportion of esophageal cancel among those in the higher temp group minus those in the lower temp group is greater than 0.
+
+$t_{stat}$ = `r round(t_stat, 4)`  

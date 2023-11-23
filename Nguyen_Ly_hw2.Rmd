@@ -1,0 +1,190 @@
+---
+title: 'STAT 630: Homework 2'
+author: ' '
+date: 'Due: September 16th, 2023 at 11:59pm'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gtsummary)
+```
+
+**Exploratory Data Analysis**: The overarching goal of this homework is to explore whether there is any evidence suggestive of discrimination by sex in the employment of the faculty at a single university (University of Washington). To this end, salary data (available on Canvas) was obtained on all faculty members employed by the University during the 1995 academic year. You have been asked to provide an analysis of 1995 salaries with the primary goal of determining whether or not gender discrimination exists with respect to pay. Along with the 1995 salary the following additional variables were also collected:
+
+| Variable    | Description                                                                       |
+|---------------|---------------------------------------------------------|
+| id          | The anonymous identification number for the faculty member sex                    |
+| sex         | Sex of the faculty member (coded as M or F)                                       |
+| degree      | The highest degree obtained by the faculty member (PhD, Professional, Other)      |
+| field       | Field of research during 1995 (Arts, Professional, Other)                         |
+| year_degree | Year highest degree attained                                                      |
+| start_year  | Year starting employment at the university                                        |
+| rank        | Faculty rank as of 1995 (Assistant, Associate, Full)                              |
+| admin       | Does faculty member hold an administrative position as of 1995? (0 = No, 1 = Yes) |
+| salary      | 1995 salary in US dollars                                                         |
+
+```{r}
+install.packages("tidyverse")
+salary <- read.csv("~/Documents/Personal Docs_East Bay/STAT 630/salary.csv")
+#install.packages("explore")
+library(explore)
+library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(qwraps2)
+summary(salary)
+glimpse(salary)
+#View(salary)
+```
+
+1.  Coerce `sex`, `degree`, `field`, `rank`, and `admin` to factors.
+
+```{r}
+salary <- read.csv("~/Documents/Personal Docs_East Bay/STAT 630/salary.csv")
+salary$sex_f <- factor(salary$sex)
+levels(salary$sex_f)
+salary$sex_f <- as.numeric(salary$sex_f)
+
+salary$deg_f <- factor(salary$deg)
+levels(salary$deg_f)
+salary$deg_f <- as.numeric(salary$deg_f)
+
+
+salary$field_f <- factor(salary$field)
+levels(salary$field_f)
+salary$field_f <- as.numeric(salary$field_f)
+
+salary$rank_f <- factor(salary$rank)
+levels(salary$rank_f)
+salary$rank_f <- as.numeric(salary$rank_f)
+
+salary$admin_f <- factor(salary$admin,
+                         labels = c("No", "Yes"))
+```
+
+2.  Make a new column called `years_uni` and calculate the number of years the instructor has been teaching at the University (note that start year is recorded using only the last two digits of the year, e.g., 95 rather than 1995).
+
+```{r}
+salary <- salary %>%
+  mutate(years_uni = 1995-(start_year + 1900))
+```
+
+3.  Create a table of descriptive statistics for each variable in the dataset, stratified by `sex`. Use the `kable()` function to create a publication-quality table (use the table in HW 1 as a guide!). Use the packages in the `tidyverse` (like `dplyr`) and include all of the code used.
+
+```{r}
+# Code used to create table
+#install.packages("tidyverse")
+#library(tidyverse) # Load the tidyverse packages
+#tidyverse_packages() # View packages included in the tidyverse
+salary %>%
+  group_by(sex) %>%
+  summarise_if(is.numeric, mean_sd,na_rm = TRUE,denote_sd = "paren")
+
+tab <- matrix(c(919.83, 491.30, 876.76, 511.66, 81.11, 8.70, 74.37, 9.64, 85.47, 8.02, 79.62,
+                10.17, 0.08, 0.27, 0.12, 0.32,5396.91, 1481.22, 6731.64, 2089.76),nrow = 2,byrow = TRUE)
+
+knitr::kable(tab)
+
+salary %>%
+  group_by(sex) %>%
+  count_pct(deg)
+
+install.packages("skimr")
+library(skimr)
+
+
+  
+```
+
+4.  Based on the table you created above, does there appear to be sex discrimination at the University? Explain in 2-3 sentences.
+
+It does seem there may be evidence of sex discrimination at the University. The mean salary for males (6,731.64) is notably higher than that of females (5,396.91), indicating a significant disparity. Additionally, the higher standard deviation for males (2,089.76) compared to females (1,481.22) suggests greater variability in male salaries, potentially indicating that there are more extreme cases of overcompensation for males.
+
+5.  Choose what you believe to be the top two confounding variables in the relationship between sex and salary. Explain how each confounding variable is related to both sex and salary.
+
+I believe Field and Degree are the top two confounding variables in the relationship between sex and salary. As we can see these two graphs plotted below.
+
+For field of conducted research, we can see that it also changes according to gender and salary as well. The salary of Professional faculty members is the highest. Below Professional's salary is Other and Arts. The mean and standard deviation of male faculty members are also higher than female in each field.
+
+For degree obtained by the faculty member, it also differ according to salary and gender. The mean and standard deviation of male faculty member's salary are also higher than female's in each type of degree.
+
+```{r}
+ggplot(salary, aes(x = deg, y = salary, fill = sex)) +
+  geom_boxplot()+
+  labs(title = "Salary Distribution by Degree and Sex of The Faculty Member",
+       x = " The highest degree obtained by the faculty member",
+       y = "Salary",
+       )
+```
+
+```{r}
+ggplot(salary, aes(x = field, y = salary, fill = sex)) +
+  geom_boxplot()+
+  labs(title = "Salary Distribution by Field and Sex of The Faculty Member",
+       x = "Field of Research",
+       y = "Salary",
+       )
+```
+
+6.  Using `base` R, plot the relationship between sex and salary.
+
+```{r}
+label = c("Female", "Male")
+boxplot(salary~sex, salary, names = label,
+        main = "Salary Distribution By Sex of The Faculty Member",
+        xlab = "Gender",
+        ylab = "Salary",
+        col.lab="blue")
+
+
+```
+
+7.  Using `ggplot2`, plot the relationship between sex, salary, and one of your confounding variables.
+
+```{r}
+
+ggplot(salary, aes(x = field, y = salary, fill = sex)) +
+  geom_boxplot()+
+  labs(title = "Salary Distribution by Field and Sex of The Faculty Member",
+       x = "Field of Research",
+       y = "Salary",
+       )
+
+```
+
+8.  Comment on how the relationship between sex and salary changes for different values of your confounding variable in 1-2 sentences.
+
+As shown on the boxplot above, we can see that the salary of professional field of research is highest and has greatest variability compared to Other and Arts. The salary of Art field of research is lowest. So we can see that the salary of the faculty member increases from Arts to Professional research. However, the range and amount of salary of Male staff is always higher than that of female.
+
+Challenge question: Visualize the relationship between sex, salary, and [both]{.underline} of your confounding variables in a single plot.
+
+```{r}
+ggplot(salary) +
+  geom_boxplot(aes(x = field, y = salary, fill = sex)) +
+  facet_wrap(~ deg)+
+  labs(title = "Salary Distribution by Field, Sex, Research Field and Degree of The Faculty Member",
+       x = "Field of Research",
+       y = "Salary",)
+```
+
+
+
+```{r}
+salary %>% 
+  select(sex, salary, rank) %>% 
+  tbl_summary()
+
+salary %>% 
+  select(~id) %>% 
+  tbl_summary(by = sex,
+              digits = list(
+                all_continuous()~c(2,2)
+              ),
+              statistic = list(
+                all_continuous() ~ "{mean} ({sd})"
+              ))
+```
+

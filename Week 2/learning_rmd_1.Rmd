@@ -1,0 +1,273 @@
+---
+title: "Let's Learn R Markdown"
+date: "2023-08-31"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("openintro") ## AHH NEVER DO THIS
+library(openintro)
+```
+
+# Hello world.
+## Hello world.
+### Hello world.
+#### Hello world.
+##### Hello world.
+
+****  
+
+*Hello* **world**.
+~~Hello world~~.
+
+> Add two spaces at the end of a line.
+
+Hello world.  
+Hello world.
+
+### Creating R chunks
+
+: Keyboard shortcut: command (ctrl) + option + i.
+
+```{r loading_data}
+# Hello world.
+data("mtcars")
+#data("mtcar")
+View(mtcars)
+```
+
+: R chunk options
+
+Where is it??
+```{r chunk_options, eval=FALSE, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+# Hello world.
+summary(mtcars)
+#summary(mtcars)
+```
+
+Here it is!
+```{r}
+summary(mtcars)
+```
+
+## PLEASE DO NOT DO THIS....EVER
+```{r}
+mtcars
+```
+
+```{r}
+mean(mtcars$mpg)
+# mean(mtcars$mpg)
+```
+
+Or you can write inline code.. The mean mpg for cars in 1974 is `r round( mean(mtcars$mpg), 2)`.
+
+```{r}
+# mean_mpg <- mean(mtcars$mpg)
+# mean_mpg_1 <- round(mean(mtcars$mpg), 2)
+# sd_mpg <- sd(mtcars$mpg)
+
+mean_mpg <- mean(mtcars$mpg)
+sd_mpg <- round(sd(mtcars$mpg),2)
+
+mean_wt <- round( mean(mtcars$wt), 2)
+sd_wt <- round( sd(mtcars$wt), 2)
+
+mtcars <- factor(mtcars$am)
+
+# mtcars$am_f <- factor(mtcars$am,
+#                       labels = c("automatic", "manual"))
+
+table(mtcars$am_f)
+
+addmargins(table(mtcars$am_f))
+
+# 
+# mtcars$am_f <- factor(mtcars$am,
+#                       labels = c("automatic", "manual"))
+# 
+# table(mtcars$am_f) # WAIT! BE CAREFUL HERE
+# 
+# summary(mtcars$am_f)
+# 
+# 
+# addmargins(table(mtcars$am_f))
+# 
+# mean_mpg <- mean(mtcars$mpg)
+# 
+# mean_mpg_1 <- round(mean(mtcars$mpg), 2)
+# 
+# sd_mpg <- sd(mtcars$mpg)
+# 
+# mean_wt <- round(mean(mtcars$wt), 2)
+# sd_wt <- round(sd(mtcars$wt), 2)
+# 
+# mtcars$am_f <- factor(mtcars$am,
+#                               labels = c("automatic", "manual"))
+```
+
+
+```{r}
+table(mtcars$am_f)
+```
+
+
+```{r}
+# table(mtcars$am_f) / nrow(mtcars)
+
+addmargins(table(mtcars$am_f))
+table(mtcars$am_f)/ nrow(mtcars)
+
+props <- prop.table(table(mtcars$am_f))
+props
+# # ## OR
+# props <- prop.table(table(mtcars$am_f))
+# props
+
+# table(mtcars$am_f) / nrow(mtcars)
+
+
+```
+#Making table by hand
+
+| Right | Left | Default | Center |
+|------:|:-----|---------|:------:|
+| 12 | 12 | 12 | 12 |
+| 123 | 123 | 123 | 123 |
+| 1 | 1 | 1 | 1 |
+
+| Variable | mean (sd) or n (%) |
+|--------|--------------|
+| mpg | `r mean_mpg` (`r sd_mpg`) |
+| weight | `r mean_wt` (`r sd_wt`) |
+| Transmission | |
+| - Automatic | 19 (`r props[1]*100`%) |
+| - Manual | 13 (`r props[2]*100`%) |
+
+```{r}
+# summarizing lots of variables
+apply(mtcars[, 1:3], 2, mean) 
+#indicates that you want to apply the mean() function to each column of the selected subset of the mtcars dataset (which contains the first three columns).
+# apply(..., 1, ...) would apply the function to each row.
+# apply(..., 2, ...) applies the function to each column.
+
+apply(mtcars[,1:5], 2, mean)
+
+apply(mtcars[,1:6], 2, sd)
+
+```
+```{r}
+# #####################################################
+# # STOP HERE... BACK TO SLIDES
+# 
+# # Scatterplot matrix (plotting the entire dataset)
+#plot(mtcars)
+# 
+# Plotting a quantitative variable
+
+# plot(mtcars$mpg) # hmm... not helpful
+# hist(mtcars$mpg) # better, but boring
+
+hist(mtcars$mpg,
+     main = "Distribution of MPG in 1974", # Add a title
+     breaks = 10, # specify number of bars
+     xlab = "MPG", # Change x label
+     ylab = "Count", # Change y label
+     col = "blue") # Change color of bars
+
+hist(mtcars$disp,
+     main = "Distribution of DISP in 1974",
+     breaks = 10,
+     xlab = "Disp",
+     ylab = "Counts",
+     col = "green")
+
+hist(mtcars$wt,
+     main = "Dist of wt in 1974",
+     breaks = 10,
+     xlab = "wt",
+     ylab = "count",
+     col = "yellow")
+# # 
+```
+
+
+```{r}
+# Plotting a categorical variable
+plot(mtcars$am_f,
+     main = "1974 Transmission Type",
+     ylab = "Frequency")
+
+# plot(mtcars$am_f,
+#      main = "1974 Transmission Type",
+#      ylab = "Frequency")
+
+
+# barplot(table(mtcars$am_f),
+#         main = "transmission type")
+
+barplot(table(mtcars$am_f),
+        main = "1974 Transmission Type")
+
+# plot(mtcars$am_f,
+#      main = "1974 Transmission Type",
+#      ylab = "Frequency")
+#
+# # Making a scatterplot
+# # plot(x, y)
+#
+# plot(mtcars$mpg, mtcars$wt) # BORING
+plot(mtcars$drat, mtcars$wt,
+     main = "Relationship between \ndrat & Weight",
+     xlab = "Drat",
+     ylab = "Weight (1000 lbs)",
+     pch = 2,
+     col = "red",
+     cex = .5)
+
+plot(mtcars$mpg, mtcars$wt,
+     main = "Relationship between\nWeight & MPG",
+     xlab = "MPQ",
+     ylab = "Weight (1000 lbs)",
+     type = "p",
+     pch = 2,
+     col = "blue",
+     cex = .5)
+
+plot(mtcars$mpg, mtcars$wt,
+     main = "Relationship between \nWeight and MPG",
+     xlab = "MPG",
+     ylab = "Weight (1000 lbs",
+     type = "p",
+     pch = 2,
+     col = "green",
+     cex = 0.5)
+# 
+# 
+# # Installing packages
+# 
+# # install.packages("openintro") # Run once and never again!
+# library(openintro)
+# 
+# ?openintro
+# 
+# data("babies")
+
+```
+```{r}
+knitr::kable(head(mtcars[, 1:4]), "pipe")
+
+knitr::kable(head(mtcars[, 1:4]), "simple")
+
+d1 <- head(cars, 3)
+d2 <- head(mtcars[, 1:3], 5)
+knitr::kable(
+  list(d1, d2),
+  caption = 'Two tables placed side by side.',
+  booktabs = TRUE, valign = 't'
+)
+```
+

@@ -1,0 +1,178 @@
+---
+title: "Welcome to the Tidyverse!"
+subtitle: "Plus some more base R stuff"
+author: "Wendy Rummerfield"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### What is the tidyverse?
+
+According to RStudio's book, [Introduction to R](https://r-unimelb.gitbook.io/rbook/into-the-tidyverse/the-tidyverse#:~:text=What%20is%20the%20tidyverse%3F%20At%20its%20core%2C%20the,an%20alternative%20to%20the%20inbuilt%20base%20R%20functions.), "the *tidyverse* is a collection of packages designed to work together as a **full pipeline** for doing every stage of data analysis on **tidy** data as an alternative to the inbuilt [base]{.underline} R functions."
+
+### Reading in Data (from outside RStudio)
+
+Some additional reading on data import [here](https://r4ds.had.co.nz/data-import.html).
+
+| file type                    | readr function        |
+|------------------------------|-----------------------|
+| .csv (comma separated value) | `readr::read_csv()`   |
+| .txt                         | `readr::read_table()` |
+| .xml/.xlsx[^1]               | `readxl::readxl()`    |
+
+[^1]: I recommend converting Excel files to csv's. It's just easier.
+
+Using `base` R.
+
+```{r, eval = FALSE}
+recent_grads <- read.csv("~/Documents/Personal Docs_East Bay/STAT 630/Week 3/recent_grads.txt", header=FALSE)
+View(recent_grads)
+```
+
+
+```{r}
+# install.packages("tidyverse")
+# library(tidyverse) # Load the tidyverse packages
+# #tidyverse_packages() # View packages included in the tidyverse
+# 
+# library(readr) # For reading in data
+```
+
+Let's read in the recent_grads.txt file like we tried in `base`, but this time using `readr`.
+
+Use the Import Dataset tool in the Environment window and choose "From Text (readr)..."
+
+```{r}
+recent_grads <- read_csv("data/recent_grads.txt")
+```
+
+### the `here` package
+
+Assuming you are in an R Project for this class, try to knit the document at this point.
+
+Did it work?
+
+If not (or even if it did), let's utilize another package in R called `here`. The `here` package is sort of a shortcut way to tell R that your [working directory]{.underline} is whatever *project folder* your file is in currently. This saves you from having to find the long file path. Also, this is an essential tool for reproducibility. If you share your R project with someone else, they will be able to knit/run your code without having to change file paths.
+
+First, make sure to install the here package.
+
+```{r}
+#install.packages("here") # after installation, delete this code chunk
+```
+
+But wait, there's *another* cool R thing. Rather than download an entire package just to use one or two functions, you can temporarily utilize a package by typing the package name followed by two colons. Type the function you want to use immediately after the colons with no spaces!
+
+```{r}
+recent_grads <- read_csv(here::here("data/recent_grads.txt"))
+```
+
+`recent_grads` has the class [tibble]{.underline}. A tibble is kind of like a data frame (df), but it [prints]{.underline} differently.
+
+```{r, eval = FALSE}
+# Run the following in the Console to see the difference
+recent_grads
+as.data.frame(recent_grads)
+```
+
+### Viewing Data
+
+#### glimpse()
+
+The function `glimpse()` from the `dplyr` package gives us a quick snapshot of the first few rows in our dataset. It shows us all of the columns and some values, the type of each column, and the dimension.
+
+```{r}
+# install.packages("dplyr")
+# library(dplyr)
+
+glimpse(recent_grads) 
+```
+
+#### summary()
+
+The function `summary()` from the `base` package gives a quick summary of the data. For numeric variables (int, dbl, or num) R will give a five-number-summary plus the mean. For factors (fct) R will give a count of the number of units in each category. For text (chr), R will give the length (basically, it's not helpful at all and most likely, you are going to want to convert it to a factor.
+
+```{r}
+summary(recent_grads)
+```
+
+
+### Subsetting Data
+
+#### The pipe operator
+
+Helpful slides from Dr. Mine Dogucu [here](https://stats295r-fa20.github.io/adv-r-website/slides/week4/04a-pipe-op.html#1).
+
+R for DS chapter [here](https://r4ds.had.co.nz/pipes.html).
+
+The [pipe]{.underline} operator `%>%` (shortcut: Cmd/Ctrl + Shift + M) from the `magrittr` package creates a sort of "pipeline" for useRs to summarize/plot/manipulate data. The pipe takes whatever data or output is on the left and runs the function on right.
+
+For example, suppose we want to find the mean of a column of data and round to the two decimal places. In `base` R this would look like:
+
+```{r}
+round(mean(c(1, 7, 2, 5, 4)))
+```
+
+Using pipes from `magrittr` this looks like:
+
+```{r}
+c(1, 7, 2, 5, 4) %>%
+  mean() %>%
+  round()
+
+round(mean(c(1,7,2,3,1)),1)
+
+c(1,3,5,6,7,8) %>% 
+  mean() %>% 
+  round()
+
+```
+
+[Here](https://stats295r-fa20.github.io/adv-r-website/slides/week4/04b-subset-data.html#1) are some helpful slides on subsetting data from (once again), Dr. Mine Dogucu.
+
+#### select()
+
+To "select" a **column** or range of columns use the `select()` function.
+
+```{r}
+recent_grads %>%
+  select(Rank, Major, Total, Major_category) %>%
+  select(-Rank)
+
+recent_grads %>%
+  select(Women, ShareWomen, Sample_size) %>%
+  select(-ShareWomen)
+
+# #recent_grads[, c("Rank", "Major", "Total", "Major_category")]
+# 
+recent_grads[, c("Rank", "Women", "ShareWomen", "Sample_size")]
+
+recent_grads %>% 
+  select(Rank, Major, Total) %>% 
+  select(- Rank)
+
+recent_grads[, c("Rank", "Major", "Total")]
+```
+
+#### filter()
+
+To "filter" certain **rows** based on specific attributes.
+
+```{r}
+# recent_grads %>% 
+#   select(Rank, Major, Total, Major_category) %>% 
+#   filter(Rank <= 10) %>% 
+#   select(-Rank) 
+
+recent_grads %>% 
+  select(Rank, Women, ShareWomen, Sample_size) %>% 
+  filter(Rank <= 15) 
+
+recent_grads[recent_grads$Rank <= 10, c("Major", "Total", "Major_category")]
+
+recent_grads[recent_grads$Rank <= 10, c("Women", "ShareWomen", "Sample_size")]
+
+
+```

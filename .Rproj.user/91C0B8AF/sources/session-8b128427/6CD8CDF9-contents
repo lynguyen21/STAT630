@@ -1,0 +1,135 @@
+---
+title: "Chi-Squared Tests"
+date: 'October 24th, 2023'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+### The `prop.test()` function
+
+**Ice cream preferences.** Is the percentage of Creamery customers who prefer chocolate ice cream over vanilla less than 80\%? In a sample of 50 customers 60\% preferred chocolate over vanilla.
+
+$H_0$: $p=0.8$
+$H_A$: $p<0.8$
+
+```{r}
+z_stat <- (0.6 - 0.8)/sqrt(0.8*(1-0.8)/50)
+z_stat
+
+sqrt(11.281)
+pnorm(z_stat)
+```
+
+
+```{r}
+?prop.test
+prop.test(x = 30 , n = 50 , p = 0.8 , alternative = "less")
+```
+
+
+## The Chi-Squared Distribution
+```{r}
+x <- seq(0, 20, 0.1)
+chi1 <- dchisq(x, df = 3)
+chi5 <- dchisq(x, df = 5)
+chi10 <- dchisq(x, df = 10)
+
+plot(x, chi1, type = "l", 
+     ylim = c(0, 0.3),
+     ylab = "f(x)",
+     main = "Chi-Squared Distribution")
+lines(x, chi5, lty = 2)
+lines(x, chi10, lty = 3)
+```
+
+## Chi-Squared Test for Goodness of Fit
+
+Consider a standard package of milk chocolate M&Ms. There are six different colors: red, orange, yellow, green, blue and brown. Suppose that we are curious about the distribution of these colors and ask, do all six colors occur in equal proportion?
+
+Suppose that we have a simple random sample of 600 M&M candies with the following distribution:
+
+212 of the candies are blue.
+147 of the candies are orange.
+103 of the candies are green.
+50 of the candies are red.
+46 of the candies are yellow.
+42 of the candies are brown.
+
+Option 1: By Hand
+```{r}
+obs_mm <- c(212, 147, 103, 50, 46, 42)
+exp_mm <- rep(100,6)
+num_mm_colors <- length(obs_mm)
+  
+t_stat_mm <- sum( (obs_mm - exp_mm)^2 / exp_mm )
+t_stat_mm
+
+p_val_mm <- pchisq(t_stat_mm, 
+                   df = num_mm_colors - 1,
+                   lower.tail = FALSE)
+p_val_mm <- 1 - pchisq(t_stat_mm, 
+                   df = num_mm_colors - 1)
+p_val_mm
+```
+
+Conclusion: We have enough evidence that proportions of each color of M\&M is not equal, i.e. 1/6.
+
+Option 2: Using R Functions
+```{r}
+?chisq.test
+chisq.test(obs_mm)
+```
+
+Now, suppose I have reason to believe that 40\% are blue, 20\% are orange, 20\% are green, 10\% are red, 5\% are yellow, and 5\% are brown. Do we have evidence that the proportion of M\&M colors comes from this distribution?
+
+
+```{r}
+null_prop <- c(0.4, 0.2, 0.2, 0.1, 0.05, 0.05)
+exp_mm2 <- null_prop * 600
+
+t_stat2 <- sum( (obs_mm - exp_mm2)^2 / exp_mm2 )
+p_val2 <- pchisq(t_stat2, 
+                 df = num_mm_colors - 1,
+                 lower.tail = FALSE)
+
+test <- chisq.test(obs_mm, p = null_prop)
+test$expected
+test
+```
+
+## Chi-Squared Test for Independence
+
+Suppose 395 people are randomly selected, and are "cross-classified" into one of eight cells, depending into which age category they fall and whether or not they support legalizing marijuana.
+
+  
+| | 18-24 | 25-34 | 35-49 | 50-64 | Total |
+|:----|:----:|:----:|:----:|:----:|:----|
+| Yes | 60 | 54 | 46 | 41 | 201 |
+| No | 40 | 44 | 53 | 57 | 194 |
+| Total | 100 | 98 | 99 | 98 | 395
+
+Are marijuana support and age group independent?
+
+```{r}
+data <- matrix(c(60, 54, 46, 41,
+                  40, 44, 53, 57),
+                  nrow = 2,
+                  byrow = TRUE)
+rownames(data) <- c("Yes", "No")
+colnames(data) <- c("18-24", "25-34", "35-49", "50-64")
+
+test <- chisq.test(data)
+test$expected
+
+test
+
+#X-squared = t_statistic
+```
+
+Decision: Reject $H_0$
+
+Conclusion: We have enough evident that marijuana support and age group are not independent (associated).
+

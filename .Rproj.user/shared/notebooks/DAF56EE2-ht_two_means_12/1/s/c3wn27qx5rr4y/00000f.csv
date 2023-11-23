@@ -1,0 +1,8 @@
+"0","mem %>% "
+"0","  ggplot(aes(Diff)) +"
+"0","  geom_histogram(binwidth = 7.5,"
+"0","                 col = ""white"") +"
+"0","  labs(x = ""difference in Memory Score (after - before)"","
+"0","       y = ""Frequency"","
+"0","       title = ""Distribution of differences in Memory Scores"") +"
+"0","  theme_classic()"

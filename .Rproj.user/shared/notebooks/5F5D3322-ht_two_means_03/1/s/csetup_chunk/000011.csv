@@ -1,0 +1,7 @@
+"0",""
+"0","# What should we do?"
+"0",""
+"0","cle_sac_full <- cle_sac"
+"0",""
+"0","cle_sac <- cle_sac_full %>% "
+"0","  filter(age >= 18 & age <=65)"

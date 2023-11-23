@@ -1,0 +1,119 @@
+---
+title: "Penguins_5"
+author: "Ly Nguyen"
+date: "2023-10-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+install.packages("palmerpenguins")
+install.packages("explore")
+install.packages("skimr")
+library(palmerpenguins)
+library(dplyr)
+library(ggplot2)
+library(qwraps2)
+library(explore)
+library(skimr)
+?palmerpenguins
+data(penguins)
+```
+
+#Let's get a glimpse of data
+
+```{r}
+summary(penguins)
+
+glimpse(penguins)
+?glimpse
+```
+```{r}
+#Quantitative variable
+#if has NA on column. na.rm = TRUE: remove NA
+# penguins %>% 
+#   summarise(mean(body_mass_g, na.rm = TRUE))
+
+# penguins %>%
+#   summarise_if(is.numeric,
+#                list(mn = mean,
+#                     s = sd),
+#                na.rm = TRUE)
+
+penguins %>% 
+  summarise(mean(body_mass_g, na.rm = TRUE))
+
+penguins %>% 
+  summarise_if(is.numeric,
+               list(mn = mean,
+                    s = sd),
+               na.rm = TRUE)
+
+#t() transpose function. library(qwraps2) to run mean_sd, na_rm = TRUE, denote_sd = "paren" to separate with mean
+penguins %>%
+  group_by(sex) %>%
+  summarise_if(is.numeric,
+               mean_sd, # mean_sd: calculates both the mean and standard deviation.
+               na_rm = TRUE,
+               denote_sd = "paren") #denote_sd = "paren": This argument specifies that the standard deviation will be denoted using parentheses in the output.
+
+tab <- matrix(c(42.1, 4.9, 45.85, 5.37,
+                16.43, 1.8, 17.89, 1.86),
+              nrow = 2,
+              byrow = TRUE)
+tab
+
+knitr::kable(tab)
+
+tab_1 <- matrix(c(1,2,3,4,
+                5,6,7,8),
+              nrow = 4,
+              byrow = TRUE)
+tab_1
+
+knitr::kable(tab_1)
+
+```
+```{r}
+#Categorical variables
+penguins %>%
+  group_by(sex) %>%
+  count_pct(species)
+
+#run in console also
+penguins %>%
+  group_by(sex) %>%
+  skim()
+```
+
+#ggplot2
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 250,
+                 col = "white",
+                 fill = "darkred")+
+  labs(title = "Body Mass of Palmer Penguins",
+       x = "Body Mass (g)",
+       y = "Frequency")
+
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200,
+                 col = "blue",
+                 fill = "yellow")+
+  labs(title = "Body Mass of Palmer Penguins",
+       x = "Body Mass (g)",
+       y = "Frequency")
+```
+#Boxplot
+
+```{r}
+ggplot(penguins, aes(y = body_mass_g, x = sex, fill = sex)) +
+  geom_boxplot(show.legend = FALSE)+ #REMOVE LEGEND
+  scale_x_discrete(na.translate = FALSE)+ #REMOVE NA
+  labs(title = "Body Mass of Palmer Penguins",
+       x = "Body Mass (g)",
+       y = "Frequency")+
+  theme_bw()
+```
+

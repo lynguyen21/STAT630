@@ -1,0 +1,77 @@
+---
+title: "Untitled"
+author: "Ly Nguyen"
+date: "2023-10-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+# Define parameters
+p <- 0.19
+sample_sizes <- c(25, 50, 100)
+num_samples <- 1000
+
+# Initialize a list to store the results
+sample_results <- list()
+
+# Loop over sample sizes
+for (n in sample_sizes) {
+  # Generate random samples and store in the list
+  samples <- rbinom(num_samples, n, p)
+  sample_results[[as.character(n)]] <- samples
+}
+```
+
+```{r}
+# Using the results from previous simulations
+sample_sizes <- c(25, 50, 100)
+p <- 0.19
+num_samples <- 1000
+
+# Initialize vectors to store means and standard deviations
+sampling_means <- numeric(length(sample_sizes))
+sampling_sds <- numeric(length(sample_sizes))
+
+# Loop over sample sizes
+for (i in 1:length(sample_sizes)) {
+    n <- sample_sizes[i]
+    samples <- sample_results[[as.character(n)]]
+  
+  # Calculate mean and standard deviation
+  sampling_means[i] <- mean(samples)
+  sampling_sds[i] <- sd(samples)
+}
+
+# for(i in 1:B){
+#   boot_samp <- sample(orig_samp, size = n_boot, replace = TRUE)
+#   phats[i] <- mean(boot_samp)
+# }
+```
+c,
+```{r}
+p <- 0.7
+n <- 250
+sample_proportion <- 0.35
+
+SE <- sqrt(p * (1 - p) / n)
+Z <- (sample_proportion - p) / SE
+Z
+
+probability <- 1 - pnorm(Z)
+
+probability
+```
+d,
+```{r}
+confidence_level <- 0.90
+alpha <- 1 - confidence_level
+Z <- qnorm(1 - alpha/2)
+
+lower_bound <- sample_proportion - Z * SE
+upper_bound <- sample_proportion + Z * SE
+
+lower_bound
+upper_bound
+```
+

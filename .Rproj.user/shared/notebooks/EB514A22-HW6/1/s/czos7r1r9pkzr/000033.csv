@@ -1,0 +1,7 @@
+"0","chsData_filtered <- chsData %>%"
+"0","  filter(!is.na(sbp140) & !is.na(weight) & !is.na(exint0))"
+"0",""
+"0","# Create the plot"
+"0","ggplot(chsData_filtered, aes(x = weight, y = sbp140)) +"
+"0","  geom_point() +"
+"0","  labs(x = ""Weight (lbs)"", y = ""SBP Indicator (mmHg)"", title = ""Relationship between Weight and SBP Indicator"")"

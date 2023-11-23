@@ -1,0 +1,138 @@
+---
+title: "Test 4"
+author: "Ly Nguyen"
+date: "2023-10-19"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+lower_bound <- 14.85
+upper_bound <- 32.01
+df <- 23
+
+# Calculate the probabilities
+prob_lower <- pchisq(lower_bound, df)
+prob_lower
+prob_upper <- pchisq(upper_bound, df)
+prob_upper
+
+# Calculate the probability between the bounds
+probability <- prob_upper - prob_lower
+probability
+```
+```{r}
+b <- round(qchisq(0.975, df),2)
+b
+a <- round(qchisq(0.025, df),2)
+a
+```
+```{r}
+# p <- 0.05
+# df <- 23
+
+# Calculate the quantile
+x_squared_005 <- round(qchisq(0.95, 23),2)
+
+# Print the result
+cat("X^2_0.05(23) =", x_squared_005)
+
+x_squared_095 <- round(qchisq(0.05, 23),2)
+
+# Print the result
+cat("X^2_0.95(23) =", x_squared_095)
+```
+
+
+```{r}
+z2 <- (14-6)/5
+z2
+```
+
+```{r}
+pnorm(6,6,5)
+round(pnorm(14,6,5),2)
+```
+
+
+```{r}
+round((1-pnorm(22.07, 21.37, 0.4)),4)
+pnorm(20.857, 21.37, 0.4)
+
+```
+
+
+```{r}
+mu <- 21.37
+sigma <- sqrt(0.16)
+x <- 22.07
+
+# Calculate the probability
+P_X_gt_22.07 <- 1 - pnorm(x, mean = mu, sd = sigma)
+P_X_gt_22.07
+
+n <- 15
+p <- round(pnorm(20.857, mean = mu, sd = sigma),4)  # Probability of success
+p
+
+# Calculate the probability
+P_Y_leq_2 <- pbinom(2, size = n, prob = p)
+
+P_Y_leq_2
+
+dbinom(0,15,0.998)
+```
+
+
+```{r}
+c <- pnorm(20.857, 21.37, 0.4)
+pbinom(2,15,c)
+dbinom(0,15,c)+dbinom(1,15,c)+dbinom(2,15,c)
+```
+?
+
+```{r}
+pgamma(0.5, 7, 1/16)
+k <- 0:6
+y <- sum(((8^k)*exp(-8))/factorial(k))
+y
+d = 1-y
+d
+```
+
+
+```{r}
+qchisq(0.95, 23)
+1-pchisq(0.05, 23)
+round(pnorm(16,6,5),3)-round(pnorm(-4,6,5),3)
+1-round(pnorm(15,6,5),2)
+```
+
+
+```{r}
+y <- c(1:4)
+y
+f_x_1 <- sum((1+y)/32)
+f_x_1
+
+f_x_2 <- sum((2+y)/32)
+f_x_2
+
+x <- c(1,2)
+x
+
+mu_x <- sum(x*c(f_x_1, f_x_2))
+mu_x
+
+e_xsq <- sum((x^2)*c(f_x_1, f_x_2))
+e_xsq
+
+var_x <- e_xsq - (mu_x)^2
+var_x
+```
+
+
+```{r}

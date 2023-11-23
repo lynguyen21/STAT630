@@ -1,0 +1,350 @@
+---
+title: "Homework 6"
+author: "Ly Nguyen"
+date: "2023-11-01"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+The Cardiovascular Health Study (CHS) is a population-based, longitudinal study of coronary heart disease and stroke in adults aged 65 years and older. Study participants were recruited in 1989-1990 from four communities: Forsyth County, NC; Sacramento County, CA; Washington County, MD; and Pittsburgh, PA. The data for this study consists of the subset of participants recruited in the first wave of recruitment who were `healthy,' that is, had no history of heart or circulation disease, no restriction of daily activities by illness, and no medications that would indicate heart disease. A large number of variables were determined for each study participant at baseline, that is, at the time of recruitment. The baseline examination consisted of a home interview and a clinic examination. During the home interview, information was collected on prior medical history, medical usage, and physical activity. Information was also obtained regarding the presence of impairments in physical functioning. The clinic examination included a fasting blood draw and seated blood pressure measurements.
+
+```{r}
+chsData <- read.table("~/Documents/Personal Docs_East Bay/STAT 630/HW6/chsData.txt", quote="\"", comment.char="")
+View(chsData)
+library(dplyr)
+library(ggplot2)
+library(openintro)
+library(knitr)
+
+```
+
+
+Part 1: Data Cleaning
+ 
+    1. Using any of the methods we have learned in class, clean the dataset by:
+        a. Changing categorical variables to factors (this includes clinic, season, arth, diab, income, exint0). Make sure to rename the levels of these factors to match the description in the table above.
+
+
+```{r}
+# Data Cleaning
+chsData <- chsData %>%
+  mutate(clinic = factor(clinic,
+                         labels = c("Sacramento", "Forsyth", "Washington", "Pittsburgh")),
+         season = factor(season,
+                         labels = c("summer", "fall", "winter", "spring")),
+         arth = factor(arth,
+                       labels = c("none", "arthritis")),
+         diab = factor(diab,
+                       labels = c("none", "borderline", "diabetes")),
+         income = factor(income,
+                         labels = c("< 5k", "5k-8k", "8k-12k", "12k-16k", "16k-24k", "24k-35k", "35k-50k", "> 50k")),
+         exint0 = factor(exint0,
+                         labels = c("no exercise", "low intensity", "moderate intensity", "high intensity"))
+)
+summary(chsData)
+
+```
+
+    b. Making a new variable called sbp140 that is a binary indicator of whether a person's sbp is >= 140 or < 140.
+    
+```{r} 
+# Making a new binary variable "sbp140" that is a  indicator of whether a person's sbp is >= 140 or < 140.
+# 1st way: (I just wanna try on this way)
+# chsData$sbp140 <- numeric(length(chsData$sbp))
+# for (i in 1:nrow(chsData)) {
+#   if (!is.na(chsData$sbp[i])) {
+#     if (chsData$sbp[i] >= 140) {
+#       chsData$sbp140[i] <- 1
+#     } else {
+#       chsData$sbp140[i] <- 0
+#     }
+#   } else {
+#     is.na(chsData$sbp[i]) <- NA
+#   }
+# }
+
+# 2nd way:
+chsData <- chsData %>% 
+  mutate(sbp140 = case_when(sbp >= 140 ~ ">= 140",
+                            sbp >= 0 & sbp < 140 ~ "< 140",
+                            TRUE ~ NA)) %>% 
+  mutate(sbp140 = factor(sbp140))
+
+summary(chsData)
+```
+
+    Part 2: Exploratory Data Analysis 
+
+    2. Missing Values: 
+        a. Make a publication-quality table that shows the number of missing rows for each variable in the dataset. 
+        
+```{r}
+missing_values <- colSums(is.na(chsData))
+
+summary_table <- data.frame(
+  Variable = names(missing_values),
+  Missing_Count = missing_values
+)
+
+summary_table <- summary_table[order(summary_table$Missing_Count),]
+summary_table
+
+kable(summary_table)
+```
+      
+      b. Based on the table you made in part (a), do you think we will introduce any bias in our study if we remove these missing values? Explain.
+      
+It can be seen that the missing values are not in some certain comunities's data. For some variables: exint0, kcal0, grade, weight, sbp, diab the number of their missing values is pretty small compared to 2440 observations. Therefore, removing their missing values may not cause bias because they are randomly missed and in small counts, so they are not representative of the whole population. However, for some variables with relatively higher missing counts: block0, arth, pkyrs, weight50 and income their missing values are from 25 to 157,  they are likely to to introduce bias if we remove them. 
+
+    Regardless of your answer to 2) b., remove any missing values.
+ 
+    3.  Plot 1: Create a single (meaning only one) appropriate plot to show the relationship between your new high sbp indicator (sbp140) and weight (weight). You may use any plotting functions from any R package. Be sure to include proper x and y-axis labels and a title.
+    
+```{r}
+chsData_filtered <- chsData %>%
+  filter(!is.na(sbp140) & !is.na(weight) & !is.na(exint0))
+
+# Create the plot
+ggplot(chsData_filtered, aes(x = weight, y = sbp140)) +
+  geom_point() +
+  labs(x = "Weight (lbs)", y = "SBP Indicator (mmHg)", title = "Relationship between Weight and SBP Indicator")
+```
+    
+    4. List one potential confounder from the dataset and explain how it is both related to sbp140 and weight.
+    
+exint0 : Baseline measure of exercise intensity could be a potential confounder.
+
+  - exint0 relates to sbp140: People who engage in regular exercise may have blood pressure reduction on average due to the positive effects of exercise on cardiovascular health.
+  
+  Reference: All about exercise and blood pressure - Kendall Reagan Nutrition Center. (2023, February 17). Kendall Reagan Nutrition Center. https://www.chhs.colostate.edu/krnc/monthly-blog/all-about-exercise-and-blood-pressure/#:~:text=Regular%20aerobic%20exercise%20results%20in,24%20hours%20after%20the%20activity!
+
+  - exint0 relates to weight: generally, if people do exercise regularly, they can gain weight loss or maintenance. The higher levels of exercise intensity the higher weight losses. So exint0 can affect weight.
+  
+  Reference: Kerr, M. (2022, January 19). Exercise and weight loss. Healthline. https://www.healthline.com/health/exercise-and-weight-loss
+     
+    5. Plot 2: Create a single appropriate plot to show the relationship between the high sbp indicator (sbp140) and weight (weight), and the confounding variable you chose in Question 4, i.e., your plot should include 3 variables from the dataset. You may use any plotting functions. Be sure to include proper x and y-axis labels and a title. 
+
+
+```{r}
+# Create the plot to show the relationship between the high sbp indicator (sbp140) and weight (weight)
+ggplot(chsData_filtered, aes(x = sbp140, y = weight)) +
+  geom_point() +
+  facet_wrap(~ exint0) +
+  labs(title = "Relationship between sbp140, Weight, and Exercise Intensity",
+       y = "SBP Indicator (mmHg)", x = "Weight (lbs)")
+```
+
+
+    6. Descriptive statistics: Create the following table:
+    
+```{r}
+
+chsData$gender_f <- factor(chsData$gender,
+                           labels = c("Female", "Male"))
+
+# table(chsData$gender_f) / nrow(chsData)
+table(chsData$gender_f, chsData$sbp140)
+
+props <- round(prop.table(table(chsData$gender_f, chsData$sbp140)),2)
+props
+
+
+#Mean of weight for individuals with SBP < 140
+mean_wt_lower_140 <- round(mean(chsData$weight[chsData$sbp < 140] , na.rm = TRUE),2)
+mean_wt_lower_140
+
+#Standard deviation of weight for individuals with SBP < 140
+sd_wt_lower_140 <- round(sd(chsData$weight[chsData$sbp < 140], na.rm = TRUE),2)
+sd_wt_lower_140
+
+#Mean of weight for individuals with SBP >= 140
+mean_wt_higher_140 <- round(mean(chsData$weight[chsData$sbp >= 140] , na.rm = TRUE),2)
+mean_wt_higher_140
+
+#Standard deviation of weight for individuals with SBP >= 140
+sd_wt_higher_140 <- round(sd(chsData$weight[chsData$sbp >=140], na.rm = TRUE),2)
+sd_wt_higher_140
+
+#Number and % of Diabetes according to sbp categories
+table(chsData$diab, chsData$sbp140)
+props_1 <- round(prop.table(table(chsData$diab, chsData$sbp140)),2)
+props_1
+
+
+#Mean of age for individuals with SBP < 140
+mean_age_lower_140 <- round(mean(chsData$age[chsData$sbp < 140] , na.rm = TRUE),2)
+mean_age_lower_140
+
+#Standard deviation of age for individuals with SBP < 140
+sd_age_lower_140 <- round(sd(chsData$age[chsData$sbp < 140], na.rm = TRUE),2)
+sd_age_lower_140
+
+#Mean of age for individuals with SBP >= 140
+mean_age_higher_140 <- round(mean(chsData$age[chsData$sbp >= 140] , na.rm = TRUE),2)
+mean_age_higher_140
+
+#Standard deviation of age for individuals with SBP >= 140
+sd_age_higher_140 <- round(sd(chsData$age[chsData$sbp >=140], na.rm = TRUE),2)
+sd_age_higher_140
+
+```
+    
+| Variable     | SBP < 140 mmHg                                 | SBP >= 140 mmHg         |
+|--------------|------------------------------------------------|-------------------------|
+|              | mean(sd) or n (%)                              |  mean(sd) or n  (%)     |
+|Sex           |Female:     909 (`r round((props[1]*100),2)`%)  |Female:     548 (`r round((props[3]*100),2)`%) |
+|              |Male:     680 (`r round((props[2]*100),2)`%)    |Male:     368 (`r round((props[4]*100),2)`%)   |
+|Weight        |mean: `r mean_wt_lower_140` (sd: `r sd_wt_lower_140`)     |mean: `r mean_wt_higher_140` (sd: `r sd_wt_higher_140`)  |
+|Diabetes      |None:     1197 (`r props_1[1]*100`%)  |None:     638 (`r props_1[4]*100`%) |
+|              |Borderline:     184 (`r props_1[2]*100`%)  |Borderline:     133 (`r props_1[5]*100`%) |
+|              |Diabetes:     127 (`r props_1[3]*100`%)  |Diabetes:     138 (`r props_1[6]*100`%) |
+|Age           |mean: `r mean_age_lower_140` (sd: `r sd_age_lower_140`)     |mean: `r mean_age_higher_140` (sd: `r sd_age_higher_140`)  |
+
+
+    Part 3: Data Analysis
+    
+7. First, we want to know if the proportion of those with high sbp (i.e., sbp > 140 mmHg) is different from 50%. Test this by 1. writing the null and alternative hypothesis in symbols, 2. computing a 95% confidence interval, and 3. making a decision and concluding in the context of the problem. Assume conditions are met; you do not need to check. Include any R code used in this analysis.
+
+**Step 1:** Hypotheses:
+
+$H_0$: $p=0.5$
+$H_A$: $p\neq 0.5$
+
+**Step 2:** 
+
+Computing a 95% confidence interval.
+```{r}
+table(chsData$sbp140)
+
+addmargins(table(chsData$sbp140))
+
+table(chsData$sbp140) / nrow(chsData)
+
+
+num_total <- 2440 
+
+prop.test(x = 916, n = 2440, p = 0.50, alternative = "two.sided")
+```
+**Step 3:** Making a decision and concluding in the context of the problem
+
+Decision: Fail to reject $H_0$.
+. 
+Conclusion: We do not have enough evidence to conclude that the proportion of those with high sbp (i.e., sbp > 140 mmHg) is different from 50%. 
+
+    8. Do people with high sbp (>140 mmHg), on average, weigh more compared to those who have low sbp (<140 mmHg)? Test this by 1. writing the null and alternative hypothesis in symbols, 2. computing the test statistic and p-value, and 3. writing a conclusion in the context of the problem. Assume conditions are met; you do not need to check. Include any R code used in this analysis. 
+    
+1) Write the hypotheses.
+
+$H_0:$ $\mu_{\geq140} = \mu_{<140}$
+
+$H_A:$$\mu_{\geq140} > \mu_{<140}$
+    
+    
+2) Computing the test statistic
+
+```{r}
+xbar1 <- mean_wt_higher_140
+xbar1
+xbar2 <- mean_wt_higher_140
+xbar2
+
+s1 <- sd_wt_higher_140
+s2 <- sd_wt_lower_140
+
+n1 <- length(chsData$sbp140)
+n2 <- length(chsData$sbp140)
+
+stat <- xbar1 - xbar2
+null_value <- 0
+se <- sqrt(s1^2/n1 + s2^2/n2)
+
+df <- min(c(n1, n2)) - 1
+
+
+t_stat <- (stat - null_value) / se 
+t_stat
+
+# sbp_higher_140 <- chsData %>% 
+#   filter(sbp140 == ">= 140", !is.na(weight)) %>% 
+#   select(weight) %>% 
+#   pull()
+# 
+# sbp_lower_140 <- chsData %>% 
+#   filter(sbp140 == "< 140", !is.na(weight)) %>% 
+#   select(weight) %>% 
+#   pull()
+# 
+# t.test <- t.test(sbp_higher_140, sbp_lower_140, alternative = "greater",
+#        conf.level = 0.95)
+# t.test
+
+```
+3) Calculate p-value
+
+```{r}
+p_val <- pt(t_stat, df = df, lower.tail = FALSE)
+p_val
+```
+
+4) Decision and conclusion in context:
+
+Decision: Fail to reject $H_0$
+
+Conclusion: We do not have evidence to conclude that people with high sbp (>140 mmHg), on average, weigh more compared to those who have low sbp (<140 mmHg).
+
+    9. Use the following code to create a new variable called weight_grp, which groups weight into 3 categories: < 135 lbs, 135-160lbs, and > 160 lbs. Now, test whether or not there is a relationship between low/high sbp (sbp140) and weight group (weight_grp). Perform a full 5-step hypothesis test, including checking condition
+
+```{r}
+chsData <- chsData %>% 
+  mutate(weight_grp = case_when(weight < 135 ~ "< 135 lbs",
+                                weight >= 135 & weight <= 160 ~ "135-160 lbs",
+                                TRUE ~ "> 160 lbs")) %>%
+    mutate(weight_grp = factor(weight_grp))
+
+```
+
+Step 1: Hypotheses 
+
+$H_0$: There is no relationship between low/high systolic blood pressure (sbp140) and weight group (weight_grp)
+
+$H_A$: There is a relationship between low/high systolic blood pressure (sbp140) and weight group (weight_grp)
+
+Step 2: Check conditions
+
+Independence: Assuming the participants researched were randomly selected.
+
+Expected counts: 2440 observations > 5 (checked)
+
+Step 3: Calculate p-value using R function
+
+```{r}
+data <- table(chsData$sbp140, chsData$weight_grp)
+data
+
+test <- chisq.test(data)
+test
+```
+Step 4: Decision
+
+p-value > 0.05. So, we fail to reject null hypotheses.
+
+Step 5: Conclusion in context:
+
+We do not have enough evidence to conclude that low/high systolic blood pressure (sbp140) and weight group (weight_grp) have a relationship.
+
+
+    Part 4: Discuss the Results 
+ 
+    10. Based on the results above, do you think there is evidence that increased weight is associated with increased blood pressure? State yes or no, and explain how you came to this decision using the results of your tests from above.
+
+As the results of question 8 and question 9 we can see that we do not have evidence to conclude that people with high sbp (>140 mmHg), on average, weigh more compared to those who have low sbp (<140 mmHg), additionally,  we also do not have enough evidence to conclude that low/high systolic blood pressure (sbp140) and weight group (weight_grp) have a relationship. Since weight gained is unlikely to introduce higher sbp, besides blood pressure has no relationship with weight, so there is not enough evidence to conclude that increased weight is associated with increased blood pressure. 
+
+
+
+
+
+
+

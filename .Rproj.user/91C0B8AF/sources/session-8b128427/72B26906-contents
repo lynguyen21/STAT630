@@ -1,0 +1,48 @@
+---
+title: "Simple Linear Regression"
+date: "10/31/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# library(tidyverse)
+```
+
+```{r, warning=FALSE, message=FALSE}
+iq_gpa <- read.csv("~/Documents/Personal Docs_East Bay/STAT 630/islander_data2.csv")
+
+glimpse(iq_gpa)
+
+ggplot(iq_gpa, aes(x = iq, y = gpa)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE) +
+  labs(title = "GPA vs. IQ",
+       x = "IQ",
+       y = "GPA")
+```
+
+
+```{r}
+mod <- lm(gpa ~ iq, data = iq_gpa)
+mod$coefficients
+
+summary(mod)
+```
+
+\widehat{GPA} = `r round(mod$coefficients[1], 4)` + `r mod$coefficients[2]` IQ
+
+### Correlation and $R^2$
+
+```{r}
+# Correlation
+cor(iq_gpa$iq, iq_gpa$gpa)
+cor(iq_gpa$gpa, iq_gpa$iq)
+# OR
+sqrt(summary(mod)$r.squared)
+
+# R-squared
+summary(mod)$r.squared
+```
+
+

@@ -1,0 +1,6 @@
+"0","# Create the plot"
+"0","ggplot(chsData_filtered, aes(x = sbp140, y = weight)) +"
+"0","  geom_point() +"
+"0","  facet_wrap(~ exint0) +"
+"0","  labs(title = ""Relationship between sbp140, Weight, and Exercise Intensity"","
+"0","       y = ""SBP Indicator (mmHg)"", x = ""Weight (lbs)"")"

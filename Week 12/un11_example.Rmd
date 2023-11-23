@@ -1,0 +1,114 @@
+---
+title: "UN Data"
+date: "November 9th, 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+require(alr4)
+library(dplyr)
+library(ggplot2)
+
+# Load data
+data("UN11")
+
+summary(UN11)
+```
+
+**Goal**: Model the relationship between per capita gross domestic product (`ppgdp`) and life expectancy of females (`lifeExpF`).
+
+**Population Model**: 
+
+$Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i$, $\varepsilon_i \overset{iid}{\sim} N(0, \sigma)$
+
+Life expectancy (of females) = $\beta_0$ + $\beta_1$ ppgdp + $\varepsilon$
+
+
+**Confounders**: (associated with both X and Y)  
+-
+
+**Precision Variables**: (associated with Y, but not X)  
+- 
+
+**Hypotheses**:
+
+$H_0:$ 
+
+$H_A:$
+
+
+**Check Conditions**:
+
+Linearity
+```{r}
+ggplot(UN11, aes(x = ppgdp, y = lifeExpF)) +
+  geom_point()
+```
+
+Independence: 
+
+Normality of the residuals
+```{r}
+# Run SLR model
+mod <- lm(lifeExpF ~ ppgdp, data = UN11)
+
+# Check Normality Assumption
+qqnorm(resid(mod))
+qqline(resid(mod), col = "red")
+
+hist(resid(mod))
+```
+
+Equal (constant) Variance of the residuals
+```{r}
+plot(resid(mod) ~ fitted(mod), main = "Residuals vs. Fitted")  
+abline(h = 0, col = "red") 
+```
+
+
+```{r}
+hist((UN11$lifeExpF))
+```
+
+
+### Transform X
+
+```{r}
+UN11 <- UN11 %>% 
+  mutate(log_ppgdp = log(ppgdp))
+```
+
+Check Assumptions
+```{r}
+ggplot(UN11, aes(x = log_ppgdp, y = lifeExpF)) +
+  geom_point()
+
+# Run model with transformed x
+mod_new <- lm(lifeExpF ~ log_ppgdp, data = UN11)
+
+# Check Normality Assumption
+qqnorm(resid(mod_new))
+qqline(resid(mod_new), col = "red")
+
+# Check Equal (Constant) Variance Assumption
+plot(resid(mod_new) ~ fitted(mod_new), main = "Residuals vs. Fitted") 
+abline(h = 0, col = "red") 
+
+```
+
+
+Summary Statistics:
+
+```{r}
+UN11 %>% 
+  summarise(mean(log_ppgdp), sd(log_ppgdp),
+            mean(ppgdp), sd(ppgdp),
+            mean(lifeExpF), sd(lifeExpF))
+```
+
+
+

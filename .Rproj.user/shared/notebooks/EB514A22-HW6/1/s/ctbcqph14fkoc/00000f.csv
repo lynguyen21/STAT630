@@ -1,0 +1,6 @@
+"0","p_val <- pt(t_stat, df = df, lower.tail = FALSE)"
+"0","p_val"
+"1","[1]"
+"1"," 0.5"
+"1","
+"

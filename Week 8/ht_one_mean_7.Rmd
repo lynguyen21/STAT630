@@ -1,0 +1,263 @@
+---
+title: "Hypothesis Testing for One Mean"
+output: html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r, echo = FALSE}
+# Load libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Simulate the t-distribution
+
+```{r, echo = FALSE}
+x <- seq(-3.5, 3.5, by = 0.1)
+t_dist_5 <- dt(x, df = 5) #calculates the probability density function (PDF) of a t-distribution
+t_dist_10 <- dt(x, df = 10)
+t_dist_30 <- dt(x, df = 30)
+z_dist <- dnorm(x) #calculates the probability density function (PDF) of the normal distribution.
+
+plot(x, z_dist, type = "l")
+lines(x, t_dist_5, 
+      col = "dodgerblue", 
+      lty = 3,
+      lwd = 1.5)
+legend(1.5, 0.38, 
+       legend = c("z", "t, df = 5"),
+       col = c("black", "dodgerblue"),
+       lty = c(1, 3),
+       lwd = c(1, 1.5))
+
+plot(x, z_dist, type = "l")
+lines(x, t_dist_10, 
+      col = "dodgerblue", 
+      lty = 3,
+      lwd = 1.5)
+legend(1.5, 0.38, 
+       legend = c("z", "t, df = 10"),
+       col = c("black", "dodgerblue"),
+       lty = c(1, 3),
+       lwd = c(1, 1.5))
+
+plot(x, z_dist, type = "l")
+lines(x, t_dist_30, 
+      col = "dodgerblue", 
+      lty = 3,
+      lwd = 1.5)
+legend(1.5, 0.38, 
+       legend = c("z", "t, df = 30"),
+       col = c("black", "dodgerblue"),
+       lty = c(1, 3),
+       lwd = c(1, 1.5))
+```
+
+## Hypothesis Testing for One Mean
+```{r}
+# Hmm.... well this isn't helpful
+wendy_age <- c(33, "around 30?", 28, 30, 31, 29, 26, 
+               29, 29, 28, 30, 27, 32, 30, 33, 35, 32,
+               29, 32, 36, 32, "27 or 28", 31, 30, 28, 
+               28, 33, 29,
+               "either younger than me or maturer than me", 
+               26, 25, 27)
+
+survey <- as.data.frame(cbind(
+  student = 1:31,
+  wendy_age = c(33, 30, 28, 30, 31, 29, 26, 
+               29, 29, 28, 30, 27, 32, 30, 
+               33, 35, 32, 29, 32, 36, 32, 
+               27.5, 31, 30, 28, 28, 33, 29, 
+               26, 25, 27)))
+```
+
+#### Distribution of Age Guesses
+```{r}
+ggplot(survey, aes(wendy_age)) +
+  geom_histogram(binwidth = 1,
+                 col = "white") +
+  labs(x = "Guesses",
+       y = "Frequency",
+       title = "Guesses of Wendy's Age")
+```
+
+
+We are interested in if the average guess of Wendy's age is older than her real age.
+
+Wendy's actual age is... 
+
+### 1. Write the hypotheses.
+
+$H_0:$
+
+$H_A:$
+
+
+### 2. Check conditions.
+
+
+### 3. Calculate test statistic.
+
+```{r}
+xbar <- mean(survey$wendy_age)
+mu0 <- xbar
+std_dev <- sd(survey$wendy_age)
+n <- nrow(survey)
+  
+t_stat <- (xbar - mu0) / (std_dev / sqrt(n))
+t_stat
+```
+
+### 4. Calculate p-value.
+
+```{r}
+p_value <- pt(t_stat, df = n - 1, lower.tail = FALSE)
+p_value 
+```
+
+
+### 5. Make a decision and conclude in the context of the problem.
+
+$\alpha = 0.05$
+
+Decision: 
+
+Conclusion in context:  
+
+```{r}
+xbar
+std_dev
+n
+t_star <- qt(0.975, n-1)
+round(xbar + c(-1,1) * t_star * std_dev/sqrt(n), 2)
+```
+
+
+---
+
+## Practice: The Bechdel Test
+
+This dataset includes information on IMDB scores, budget/gross revenue, and ratings from 1970 - 2013.
+
+[Data](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-03-09)
+
+| **variable**  | **class** | **description**                        |
+|---------------|-----------|----------------------------------------|
+| year          | double    | Year                                   |
+| imdb          | character | IMDB                                   |
+| title         | character | Title of movie                         |
+| test          | character | Bechdel Test outcome                   |
+| clean_test    | character | Bechdel Test cleaned                   |
+| binary        | character | Binary pass/fail of bechdel            |
+| budget        | double    | Budget as of release year              |
+| domgross      | character | Domestic gross in release year         |
+| intgross      | character | International gross in release year    |
+| code          | character | Code                                   |
+| budget_2013   | double    | Budget normalized to 2013              |
+| domgross_2013 | character | Domestic gross normalized to 2013      |
+| intgross_2013 | character | International gross normalized to 2013 |
+| period_code   | double    | Period code                            |
+| decade_code   | double    | Decade Code                            |
+| imdb_id       | character | IMDB ID                                |
+| plot          | character | Plot of movie                          |
+| rated         | character | Rating of movie                        |
+| response      | character | Response?                              |
+| language      | character | Language of film                       |
+| country       | character | Country produced in                    |
+| writer        | character | Writer of film                         |
+| metascore     | double    | Metascore rating (0-100)               |
+| imdb_rating   | double    | IMDB Rating 0-10                       |
+| director      | character | Director of movie                      |
+| released      | character | Released date                          |
+| actors        | character | Actors                                 |
+| genre         | character | Genre                                  |
+| awards        | character | Awards                                 |
+| runtime       | character | Runtime                                |
+| type          | character | Type of film                           |
+| poster        | character | Poster image                           |
+| imdb_votes    | character | IMDB Votes                             |
+| error         | character | Error?                                 |
+
+#### Let's take a quick look at the data
+
+```{r, echo = FALSE, results = 'hide'}
+tuesdata <- tidytuesdayR::tt_load('2021-03-02')
+tuesdata <- tidytuesdayR::tt_load(2021, week = 11)
+
+bechdel <- tuesdata$movies
+bechdel <- bechdel %>% 
+  mutate(budget        = as.numeric(budget),
+         domgross      = as.numeric(domgross),
+         intgross      = as.numeric(intgross),
+         domgross_2013 = as.numeric(domgross_2013),
+         intgross_2013 = as.numeric(intgross_2013))
+summary(bechdel)
+```
+
+What is the sampling unit?
+
+movie
+
+Group 1: According to the internet, half of all movies released in US cinemas cost under \$18,000,000 (18 million) to make. Did movies released in 1970-2013, on average, cost less than \$18 million to make? Use the variable `budget_2013` since it is adjusted for inflation.
+
+
+Group 2: On average, did movies released in 1970-2013 make more than \$100,000,000 (\$100 million) domestically? Use the variable `domgross_2013` since it is adjusted for inflation.
+
+
+Group 3: On average, did movies released in 1970-2013 make more than \$100,000,000 (\$100 million) internationally? Use the variable `intgross_2013` since it is adjusted for inflation.
+
+
+Group 4: According to [IMDB](https://www.imdb.com/poll/MGIr14gyJNE/#:~:text=The%20average%20movie%20rating%20on%20IMDb%20is%207.0%2C,7.0%20with%20the%20most%20votes%20is%20your%20favorite%3F), the average movie rating is 7. From 1970-2013, is the average movie rating on IMDB different from 7?
+
+
+Group 5: Metascore is another type of rating on IMDB. If the average movie rating on a scale from 0-10 is 7, then is the average metascore 70? From 1970-2013, is the average movie metascore on IMDB different from 70?
+
+
+Group 3: On average, did movies released in 1970-2013 make more than \$100,000,000 (\$100 million) internationally? Use the variable `intgross_2013` since it is adjusted for inflation.
+
+### 1. Write the hypotheses.
+
+$H_0:$ Movies released in 1970-2013 make less than and equal \$100,000,000 (\$100 million) internationally
+
+$H_A:$ Movies released in 1970-2013 make more than \$100,000,000 (\$100 million) internationally
+
+
+### 2. Check conditions.
+
+it randomly and normality
+
+### 3. Calculate test statistic.
+
+```{r}
+data(bechdel)
+
+x_bar <- mean(bechdel$intgross_2013, na.rm = TRUE)
+
+mu <- 1000000000
+
+n_m <- nrow(bechdel)
+
+std_de <- sd(bechdel$intgross_2013, na.rm = TRUE)
+
+t_stats <- (x_bar - mu)/std_de *sqrt(n_m)
+
+t_stats
+
+```
+
+### 4. Calculate p-value.
+```{r}
+p_value_mv <- pt(t_stats, df = n - 1, lower.tail = FALSE)
+p_value_mv
+```
+
+
+### 5. Make a decision and conclude in the context of the problem.
+
+
+
